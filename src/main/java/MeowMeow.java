@@ -47,15 +47,36 @@ public class MeowMeow {
                 System.out.println("     OK, I've marked this task as not done yet:");
                 System.out.println("       " + taskList[index]);
                 System.out.println(line);
-            } else {
-                taskList[taskCount] = new Task(input);
+            } else if (input.startsWith("todo ")) {
+                String description = input.substring(5);
+                taskList[taskCount] = new Todo(description);
                 taskCount++;
-                System.out.println(line);
-                System.out.println("     Meow :> added: " + input);
-                System.out.println(line);
+                printAdded(line, taskList[taskCount - 1], taskCount);
+            } else if (input.startsWith("deadline ")) {
+                String remaining = input.substring(9);
+                String[] parts = remaining.split(" /by ");
+                taskList[taskCount] = new Deadline(parts[0], parts[1]);
+                taskCount++;
+                printAdded(line, taskList[taskCount - 1], taskCount);
+            } else if (input.startsWith("event ")) {
+                String remaining = input.substring(6);
+                String[] fromSplit = remaining.split(" /from ");
+                String[] toSplit = fromSplit[1].split(" /to ");
+                taskList[taskCount] = new Event(fromSplit[0], toSplit[0], toSplit[1]);
+                taskCount++;
+                printAdded(line, taskList[taskCount - 1], taskCount);
             }
+
         }
 
         scanner.close();
+    }
+
+    private static void printAdded(String line, Task task, int taskCount) {
+        System.out.println(line);
+        System.out.println("     Got it. I've added this task:");
+        System.out.println("       " + task);
+        System.out.println("     Now you have " + taskCount + " tasks in the list.");
+        System.out.println(line);
     }
 }
