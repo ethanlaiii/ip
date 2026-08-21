@@ -1,12 +1,12 @@
+import java.util.ArrayList;
 import java.util.Scanner;
-import static java.lang.Integer.parseInt;
 
 public class MeowMeow {
     private static final String LINE = "    ____________________________________________________________";
     private static final String LOGO = "  /\\_/\\\n"
                                      + " ( o.o )\n"
                                      + "  > ^ <\n";
-    private static final int MAX_TASKS = 100;
+
     public static void main(String[] args) {
         System.out.println(LINE);
         System.out.println(LOGO);
@@ -14,8 +14,7 @@ public class MeowMeow {
         System.out.println("     What can I do for you? Meow :>");
         System.out.println(LINE);
 
-        Task[] taskList = new Task[MAX_TASKS];
-        int taskCount = 0;
+        ArrayList<Task> taskList = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
 
@@ -34,38 +33,44 @@ public class MeowMeow {
                     isRunning = false;
 
                 } else if (command.equals("list")) {
-                    if (taskCount == 0) {
+                    if (taskList.isEmpty()) {
                         printMessage("Your list is empty. Nothing to do yet!");
                     } else {
                         System.out.println(LINE);
                         System.out.println("     Here are the tasks in your list:");
-                        for (int i = 0; i < taskCount; i++) {
-                            System.out.println("     " + (i + 1) + "." + taskList[i]);
+                        for (int i = 0; i < taskList.size(); i++) {
+                            System.out.println("     " + (i + 1) + "." + taskList.get(i));
                         }
                         System.out.println(LINE);
                     }
 
                 } else if (command.equals("mark")) {
-                    int index = parseIndex(arguments, taskCount, "mark") ;
-                    taskList[index].markAsDone();
-                    printTaskMessage("Nice! I've marked this task as done:", taskList[index]);
+                    int index = parseIndex(arguments, taskList.size(), "mark") ;
+                    taskList.get(index).markAsDone();
+                    printTaskMessage("Nice! I've marked this task as done:", taskList.get(index));
 
                 } else if (command.equals("unmark")) {
-                    int index = parseIndex(arguments, taskCount, "unmark");
-                    taskList[index].markAsNotDone();
-                    printTaskMessage("OK, I've marked this task as not done yet:", taskList[index]);
+                    int index = parseIndex(arguments, taskList.size(), "unmark");
+                    taskList.get(index).markAsNotDone();
+                    printTaskMessage("OK, I've marked this task as not done yet:", taskList.get(index));
+
+                } else if (command.equals("delete")) {
+                    int index = parseIndex(arguments, taskList.size(), "delete");
+                    Task removed = taskList.remove(index);
+                    System.out.println(LINE);
+                    System.out.println("     Noted. I've removed this task:");
+                    System.out.println("       " + removed);
+                    System.out.println("     Now you have " + taskList.size() + " task(s) in the list.");
+                    System.out.println(LINE);
 
                 } else if (command.equals("todo")) {
-                    checkSpace(taskCount);
                     if (arguments.isEmpty()) {
                         throw new MeowMeowException("A todo needs a description. Try: todo borrow book");
                     }
-                    taskList[taskCount] = new Todo(arguments);
-                    taskCount++;
-                    printAdded(taskList[taskCount - 1], taskCount);
+                    taskList.add(new Todo(arguments));
+                    printAdded(taskList);
 
                 } else if (command.equals("deadline")) {
-                    checkSpace(taskCount);
                     String[] parts = arguments.split("/by", 2);
                     String description = parts[0].trim();
                     if (description.isEmpty()) {
@@ -76,12 +81,10 @@ public class MeowMeow {
                         throw new MeowMeowException("I need a due date after /by. "
                                 + "Try: deadline return book /by Sunday");
                     }
-                    taskList[taskCount] = new Deadline(description, parts[1].trim());
-                    taskCount++;
-                    printAdded(taskList[taskCount -1], taskCount);
+                    taskList.add(new Deadline(description, parts[1].trim()));
+                    printAdded(taskList);
 
                 } else if (command.equals("event")) {
-                    checkSpace(taskCount);
                     String[] fromParts = arguments.split("/from", 2);
                     String description = fromParts[0].trim();
                     if (description.isEmpty()) {
@@ -102,9 +105,8 @@ public class MeowMeow {
                         throw new MeowMeowException("I need an end time after /to. "
                                 + "Try: event project meeting /from Mon 2pm /to 4pm");
                     }
-                    taskList[taskCount] = new Event(description, from, toParts[1].trim());
-                    taskCount++;
-                    printAdded(taskList[taskCount - 1], taskCount);
+                    taskList.add(new Event(description, from, toParts[1].trim()));
+                    printAdded(taskList);
                 } else {
                     throw new MeowMeowException("I don't know what \"" + command + "\" means. "
                             + "I understand: todo, deadline, event, list, mark, unmark, bye");
@@ -121,26 +123,22 @@ public class MeowMeow {
         if (arguments.isEmpty()) {
             throw new MeowMeowException("Which task? Give me a number, e.g. " + command + " 2");
         }
+        if (taskCount == 0) {
+            throw new MeowMeowException("Your list is empty, so there's nothing to " + command + ".");
+        }
         int index;
         try {
             index = Integer.parseInt(arguments) - 1;
         } catch (NumberFormatException e) {
             throw new MeowMeowException("\"" + arguments + "\" isn't a number. Try: " + command + " 2");
         }
-        if (taskCount == 0) {
-            throw new MeowMeowException("Your list is empty, so there's nothing to " + command + ".");
-        }
+
         if (index < 0 || index >= taskCount) {
             throw new MeowMeowException("There's no task " + (index + 1) + ". You have " + taskCount + " task(s).");
         }
         return index;
     }
 
-    private static void checkSpace(int taskCount) throws MeowMeowException {
-        if (taskCount >= MAX_TASKS) {
-            throw new MeowMeowException("Your list is full at " + MAX_TASKS + " tasks!");
-        }
-    }
 
     private static void printMessage(String message) {
         System.out.println(LINE);
@@ -155,11 +153,11 @@ public class MeowMeow {
         System.out.println(LINE);
     }
 
-    private static void printAdded(Task task, int taskCount) {
+    private static void printAdded(ArrayList<Task> taskList) {
         System.out.println(LINE);
         System.out.println("     Got it. I've added this task:");
-        System.out.println("       " + task);
-        System.out.println("     Now you have " + taskCount + " task(s) in the list.");
+        System.out.println("       " + taskList.getLast());
+        System.out.println("     Now you have " + taskList.size() + " task(s) in the list.");
         System.out.println(LINE);
     }
 }
