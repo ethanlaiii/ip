@@ -21,18 +21,22 @@ public class MeowMeow {
         while (isRunning) {
             String input = scanner.nextLine().trim();
             String[] words = input.split("\\s+", 2);
-            String command = words[0];
+            String commandWord = words[0];
+            CommandType command = CommandType.fromString(commandWord);
             String arguments = (words.length > 1) ? words[1].trim() : "";
 
             try {
                 if (input.isEmpty()) {
                     throw new MeowMeowException("You didn't type anything. Give me something to work with!");
 
-                } else if (command.equals("bye")) {
+                }
+
+                switch (command) {
+                case BYE -> {
                     printMessage("Bye. Hope to see you again soon! Meow :>");
                     isRunning = false;
-
-                } else if (command.equals("list")) {
+                }
+                case LIST -> {
                     if (taskList.isEmpty()) {
                         printMessage("Your list is empty. Nothing to do yet!");
                     } else {
@@ -43,18 +47,18 @@ public class MeowMeow {
                         }
                         System.out.println(LINE);
                     }
-
-                } else if (command.equals("mark")) {
-                    int index = parseIndex(arguments, taskList.size(), "mark") ;
+                }
+                case MARK -> {
+                    int index = parseIndex(arguments, taskList.size(), "mark");
                     taskList.get(index).markAsDone();
                     printTaskMessage("Nice! I've marked this task as done:", taskList.get(index));
-
-                } else if (command.equals("unmark")) {
+                }
+                case UNMARK -> {
                     int index = parseIndex(arguments, taskList.size(), "unmark");
                     taskList.get(index).markAsNotDone();
                     printTaskMessage("OK, I've marked this task as not done yet:", taskList.get(index));
-
-                } else if (command.equals("delete")) {
+                }
+                case DELETE -> {
                     int index = parseIndex(arguments, taskList.size(), "delete");
                     Task removed = taskList.remove(index);
                     System.out.println(LINE);
@@ -62,15 +66,15 @@ public class MeowMeow {
                     System.out.println("       " + removed);
                     System.out.println("     Now you have " + taskList.size() + " task(s) in the list.");
                     System.out.println(LINE);
-
-                } else if (command.equals("todo")) {
+                }
+                case TODO -> {
                     if (arguments.isEmpty()) {
                         throw new MeowMeowException("A todo needs a description. Try: todo borrow book");
                     }
                     taskList.add(new Todo(arguments));
                     printAdded(taskList);
-
-                } else if (command.equals("deadline")) {
+                }
+                case DEADLINE -> {
                     String[] parts = arguments.split("/by", 2);
                     String description = parts[0].trim();
                     if (description.isEmpty()) {
@@ -83,8 +87,8 @@ public class MeowMeow {
                     }
                     taskList.add(new Deadline(description, parts[1].trim()));
                     printAdded(taskList);
-
-                } else if (command.equals("event")) {
+                }
+                case EVENT -> {
                     String[] fromParts = arguments.split("/from", 2);
                     String description = fromParts[0].trim();
                     if (description.isEmpty()) {
@@ -107,9 +111,11 @@ public class MeowMeow {
                     }
                     taskList.add(new Event(description, from, toParts[1].trim()));
                     printAdded(taskList);
-                } else {
+                }
+                case UNKNOWN -> {
                     throw new MeowMeowException("I don't know what \"" + command + "\" means. "
                             + "I understand: todo, deadline, event, list, mark, unmark, bye");
+                }
                 }
             } catch (MeowMeowException e) {
                 printMessage(e.getMessage());
