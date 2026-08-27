@@ -14,7 +14,14 @@ public class MeowMeow {
         System.out.println("     What can I do for you? Meow :>");
         System.out.println(LINE);
 
-        ArrayList<Task> taskList = new ArrayList<>();
+        Storage storage = new Storage();
+        ArrayList<Task> taskList;
+        try {
+            taskList = storage.load();
+        } catch (MeowMeowException e) {
+            printMessage(e.getMessage() + " Starting with an empty list.");
+            taskList = new ArrayList<>();
+        }
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
 
@@ -51,16 +58,19 @@ public class MeowMeow {
                 case MARK -> {
                     int index = parseIndex(arguments, taskList.size(), "mark");
                     taskList.get(index).markAsDone();
+                    storage.save(taskList);
                     printTaskMessage("Nice! I've marked this task as done:", taskList.get(index));
                 }
                 case UNMARK -> {
                     int index = parseIndex(arguments, taskList.size(), "unmark");
                     taskList.get(index).markAsNotDone();
+                    storage.save(taskList);
                     printTaskMessage("OK, I've marked this task as not done yet:", taskList.get(index));
                 }
                 case DELETE -> {
                     int index = parseIndex(arguments, taskList.size(), "delete");
                     Task removed = taskList.remove(index);
+                    storage.save(taskList);
                     System.out.println(LINE);
                     System.out.println("     Noted. I've removed this task:");
                     System.out.println("       " + removed);
@@ -72,6 +82,7 @@ public class MeowMeow {
                         throw new MeowMeowException("A todo needs a description. Try: todo borrow book");
                     }
                     taskList.add(new Todo(arguments));
+                    storage.save(taskList);
                     printAdded(taskList);
                 }
                 case DEADLINE -> {
@@ -86,6 +97,7 @@ public class MeowMeow {
                                 + "Try: deadline return book /by Sunday");
                     }
                     taskList.add(new Deadline(description, parts[1].trim()));
+                    storage.save(taskList);
                     printAdded(taskList);
                 }
                 case EVENT -> {
@@ -110,6 +122,7 @@ public class MeowMeow {
                                 + "Try: event project meeting /from Mon 2pm /to 4pm");
                     }
                     taskList.add(new Event(description, from, toParts[1].trim()));
+                    storage.save(taskList);
                     printAdded(taskList);
                 }
                 case UNKNOWN -> {
