@@ -1,11 +1,18 @@
-public class Event extends Task {
-    protected String from;
-    protected String to;
+import java.time.LocalDate;
 
-    public Event(String description, String from, String to) {
+public class Event extends Task {
+    protected TaskDateTime from;
+    protected TaskDateTime to;
+
+    public Event(String description, TaskDateTime from, TaskDateTime to) {
         super(description);
         this.from = from;
         this.to = to;
+    }
+
+    @Override
+    public boolean occursOn(LocalDate date) {
+        return !date.isBefore(from.toLocalDate()) && !date.isAfter(to.toLocalDate());
     }
 
     @Override
@@ -15,6 +22,6 @@ public class Event extends Task {
 
     @Override
     public String toFileFormat() {
-        return "E | " + super.toFileFormat() + " | " + from + " | " + to;
+        return "E | " + super.toFileFormat() + " | " + from.toStorageFormat() + " | " + to.toStorageFormat();
     }
 }

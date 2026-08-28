@@ -1,9 +1,16 @@
-public class Deadline extends Task {
-    protected String by;
+import java.time.LocalDate;
 
-    public Deadline(String description, String by) {
+public class Deadline extends Task {
+    protected TaskDateTime by;
+
+    public Deadline(String description, TaskDateTime by) {
         super(description);
         this.by = by;
+    }
+
+    @Override
+    public boolean occursOn(LocalDate date) {
+        return by.toLocalDate().equals(date);
     }
 
     @Override
@@ -13,6 +20,6 @@ public class Deadline extends Task {
 
     @Override
     public String toFileFormat() {
-        return "D | " + super.toFileFormat() + " | " + by;
+        return "D | " + super.toFileFormat() + " | " + by.toStorageFormat();
     }
 }
