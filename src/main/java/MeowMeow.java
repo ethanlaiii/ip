@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class MeowMeow {
     private static final String LINE = "    ____________________________________________________________";
@@ -96,7 +98,8 @@ public class MeowMeow {
                         throw new MeowMeowException("I need a due date after /by. "
                                 + "Try: deadline return book /by Sunday");
                     }
-                    taskList.add(new Deadline(description, parts[1].trim()));
+                    TaskDateTime by = TaskDateTime.parse(parts[1].trim());
+                    taskList.add(new Deadline(description, by));
                     storage.save(taskList);
                     printAdded(taskList);
                 }
@@ -105,29 +108,51 @@ public class MeowMeow {
                     String description = fromParts[0].trim();
                     if (description.isEmpty()) {
                         throw new MeowMeowException("An event needs a description. "
-                                + "Try: event project meeting");
+                                + "Try: event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600.");
                     }
                     if (fromParts.length < 2) {
                         throw new MeowMeowException("I need a start time after /from. "
-                                + "Try: event project meeting /from Mon 2pm /to 4pm");
+                                + "Try: event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600.");
                     }
                     String[] toParts = fromParts[1].split("/to", 2);
-                    String from = toParts[0].trim();
-                    if (from.isEmpty()) {
+                    String fromText = toParts[0].trim();
+                    if (fromText.isEmpty()) {
                         throw new MeowMeowException("The start time after /from is empty. "
-                                + "Try: event project meeting /from Mon 2pm /to 4pm");
+                                + "Try: event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600.");
                     }
                     if (toParts.length < 2 || toParts[1].trim().isEmpty()) {
                         throw new MeowMeowException("I need an end time after /to. "
-                                + "Try: event project meeting /from Mon 2pm /to 4pm");
+                                + "Try: event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600.");
                     }
-                    taskList.add(new Event(description, from, toParts[1].trim()));
+                    TaskDateTime from = TaskDateTime.parse(fromText);
+                    TaskDateTime to = TaskDateTime.parse(toParts[1].trim());
+                    taskList.add(new Event(description, from, to));
                     storage.save(taskList);
                     printAdded(taskList);
                 }
-                case UNKNOWN -> {
-                    throw new MeowMeowException("I don't know what \"" + command + "\" means. "
-                            + "I understand: todo, deadline, event, list, mark, unmark, bye");
+                case ON -> {
+                    if (arguments.isEmpty()) {
+                        throw new MeowMeowException("Which date? Try: on 2019-12-02");
+                    }
+                    LocalDate date = TaskDateTime.parse(arguments).toLocalDate();
+                    System.out.println(LINE);
+                    System.out.println("     Tasks on " + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
+                    int matches = 0;
+                    for (Task task : taskList) {
+                        if (task.occursOn(date)) {
+                            matches++;
+                            System.out.println("     " + matches + "." + task);
+                        }
+                    }
+                    if (matches == 0) {
+                        System.out.println("     Nothing scheduled. Enjoy the free time!");
+                    }
+                    System.out.println(LINE);
+                }
+
+                    case UNKNOWN -> {
+                    throw new MeowMeowException("I don't know what \"" + commandWord + "\" means. "
+                            + "I understand: todo, deadline, event, list, mark, unmark, delete, on, bye");
                 }
                 }
             } catch (MeowMeowException e) {

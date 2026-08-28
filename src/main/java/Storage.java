@@ -65,23 +65,27 @@ public class Storage {
         }
 
         Task task;
-        switch (type) {
-            case "T" -> task = new Todo(description);
-            case "D" -> {
-                if (parts.length < 4 || parts[3].isEmpty()) {
+        try {
+            switch (type) {
+                case "T" -> task = new Todo(description);
+                case "D" -> {
+                    if (parts.length < 4 || parts[3].isEmpty()) {
+                        return null;
+                    }
+                    task = new Deadline(description, TaskDateTime.fromStorage(parts[3]));
+                }
+                case "E" -> {
+                    if (parts.length < 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
+                        return null;
+                    }
+                    task = new Event(description, TaskDateTime.fromStorage(parts[3]), TaskDateTime.fromStorage(parts[4]));
+                }
+                default -> {
                     return null;
                 }
-                task = new Deadline(description, parts[3]);
             }
-            case "E" -> {
-                if (parts.length < 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
-                    return null;
-                }
-                task = new Event(description, parts[3], parts[4]);
-            }
-            default -> {
-                return null;
-            }
+        } catch (MeowMeowException e) {
+            return null;
         }
 
         if (doneFlag.equals("1")) {
