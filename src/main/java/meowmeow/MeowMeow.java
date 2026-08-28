@@ -77,6 +77,12 @@ public class MeowMeow {
                         LocalDate date = Parser.parseDate(arguments).toLocalDate();
                         ui.showTasksOn(date, tasks.findOccurringOn(date));
                     }
+                    case FIND -> {
+                        if (arguments.isEmpty()) {
+                            throw new MeowMeowException("What should I search for? Try: find book");
+                        }
+                        ui.showMatches(tasks.findByKeyword(arguments));
+                    }
                     case UNKNOWN -> throw new MeowMeowException(
                             "I don't know what \"" + Parser.parseCommandWord(input) + "\" means. "
                                     + "I understand: todo, deadline, event, list, mark, unmark, delete, on, bye");

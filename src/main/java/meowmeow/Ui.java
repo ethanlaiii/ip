@@ -105,4 +105,22 @@ public class Ui {
         }
         showLine();
     }
+
+    /**
+     * Prints the tasks matching a search, or a message if there are none.
+     *
+     * @param matches Tasks whose descriptions matched the keyword.
+     */
+    public void showMatches(ArrayList<Task> matches) {
+        showLine();
+        if (matches.isEmpty()) {
+            System.out.println("     No matching tasks found. Meow?");
+        } else {
+            System.out.println("     Here are the matching tasks in your list:");
+            for (int i = 0; i < matches.size(); i++) {
+                System.out.println("     " + (i + 1) + "." + matches.get(i));
+            }
+        }
+        showLine();
+    }
 }
