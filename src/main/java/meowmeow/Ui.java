@@ -34,7 +34,7 @@ public class Ui {
     public void showWelcome() {
         showLine();
         System.out.println(LOGO);
-        System.out.println("     Hello! I'm meowmeow.MeowMeow.");
+        System.out.println("     Hello! I'm MeowMeow.");
         System.out.println("     What can I do for you? Meow :>");
         showLine();
     }
