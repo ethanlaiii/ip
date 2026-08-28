@@ -1,5 +1,5 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
+
 public class MeowMeow {
 
     public static void main(String[] args) {
@@ -8,12 +8,12 @@ public class MeowMeow {
 
         ui.showWelcome();
 
-        ArrayList<Task> taskList;
+        TaskList tasks;
         try {
-            taskList = storage.load();
+            tasks = new TaskList(storage.load());
         } catch (MeowMeowException e) {
             ui.showLoadingError(e.getMessage());
-            taskList = new ArrayList<>();
+            tasks = new TaskList();
         }
 
         boolean isRunning = true;
@@ -36,33 +36,33 @@ public class MeowMeow {
                     isRunning = false;
                 }
                 case LIST -> {
-                    ui.showList(taskList);
+                    ui.showList(tasks.asList());
                 }
                 case MARK -> {
-                    int index = parseIndex(arguments, taskList.size(), "mark");
-                    taskList.get(index).markAsDone();
-                    storage.save(taskList);
-                    ui.showTaskMessage("Nice! I've marked this task as done:", taskList.get(index));
+                    int index = tasks.parseIndex(arguments, "mark");
+                    tasks.markAsDone(index);
+                    storage.save(tasks.asList());
+                    ui.showTaskMessage("Nice! I've marked this task as done:", tasks.get(index));
                 }
                 case UNMARK -> {
-                    int index = parseIndex(arguments, taskList.size(), "unmark");
-                    taskList.get(index).markAsNotDone();
-                    storage.save(taskList);
-                    ui.showTaskMessage("OK, I've marked this task as not done yet:", taskList.get(index));
+                    int index = tasks.parseIndex(arguments, "unmark");
+                    tasks.markAsNotDone(index);
+                    storage.save(tasks.asList());
+                    ui.showTaskMessage("OK, I've marked this task as not done yet:", tasks.get(index));
                 }
                 case DELETE -> {
-                    int index = parseIndex(arguments, taskList.size(), "delete");
-                    Task removed = taskList.remove(index);
-                    storage.save(taskList);
-                    ui.showRemoved(removed, taskList.size());
+                    int index = tasks.parseIndex(arguments, "delete");
+                    Task removed = tasks.delete(index);
+                    storage.save(tasks.asList());
+                    ui.showRemoved(removed, tasks.size());
                 }
                 case TODO -> {
                     if (arguments.isEmpty()) {
                         throw new MeowMeowException("A todo needs a description. Try: todo borrow book");
                     }
-                    taskList.add(new Todo(arguments));
-                    storage.save(taskList);
-                    ui.showAdded(taskList.getLast(), taskList.size());
+                    Task added = tasks.add(new Todo(arguments));
+                    storage.save(tasks.asList());
+                    ui.showAdded(added, tasks.size());
                 }
                 case DEADLINE -> {
                     String[] parts = arguments.split("/by", 2);
@@ -76,9 +76,9 @@ public class MeowMeow {
                                 + "Try: deadline return book /by Sunday");
                     }
                     TaskDateTime by = TaskDateTime.parse(parts[1].trim());
-                    taskList.add(new Deadline(description, by));
-                    storage.save(taskList);
-                    ui.showAdded(taskList.getLast(), taskList.size());
+                    Task added = tasks.add(new Deadline(description, by));
+                    storage.save(tasks.asList());
+                    ui.showAdded(added, tasks.size());
                 }
                 case EVENT -> {
                     String[] fromParts = arguments.split("/from", 2);
@@ -103,22 +103,16 @@ public class MeowMeow {
                     }
                     TaskDateTime from = TaskDateTime.parse(fromText);
                     TaskDateTime to = TaskDateTime.parse(toParts[1].trim());
-                    taskList.add(new Event(description, from, to));
-                    storage.save(taskList);
-                    ui.showAdded(taskList.getLast(), taskList.size());
+                    Task added = tasks.add(new Event(description, from, to));
+                    storage.save(tasks.asList());
+                    ui.showAdded(added, tasks.size());
                 }
                 case ON -> {
                     if (arguments.isEmpty()) {
                         throw new MeowMeowException("Which date? Try: on 2019-12-02");
                     }
                     LocalDate date = TaskDateTime.parse(arguments).toLocalDate();
-                    ArrayList<Task> matches = new ArrayList<>();
-                    for (Task task : taskList) {
-                        if (task.occursOn(date)) {
-                            matches.add(task);
-                        }
-                    }
-                    ui.showTasksOn(date, matches);
+                    ui.showTasksOn(date, tasks.findOccurringOn(date));
                 }
                 case UNKNOWN -> {
                     throw new MeowMeowException("I don't know what \"" + commandWord + "\" means. "
@@ -133,24 +127,5 @@ public class MeowMeow {
         ui.close();
     }
 
-    private static int parseIndex(String arguments, int taskCount, String command) throws MeowMeowException {
-        if (arguments.isEmpty()) {
-            throw new MeowMeowException("Which task? Give me a number, e.g. " + command + " 2");
-        }
-        if (taskCount == 0) {
-            throw new MeowMeowException("Your list is empty, so there's nothing to " + command + ".");
-        }
-        int index;
-        try {
-            index = Integer.parseInt(arguments) - 1;
-        } catch (NumberFormatException e) {
-            throw new MeowMeowException("\"" + arguments + "\" isn't a number. Try: " + command + " 2");
-        }
-
-        if (index < 0 || index >= taskCount) {
-            throw new MeowMeowException("There's no task " + (index + 1) + ". You have " + taskCount + " task(s).");
-        }
-        return index;
-    }
 
 }
