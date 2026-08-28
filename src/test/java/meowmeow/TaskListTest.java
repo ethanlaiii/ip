@@ -1,0 +1,78 @@
+package meowmeow;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+public class TaskListTest {
+
+    private TaskList threeTasks() {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+        tasks.add(new Todo("return book"));
+        tasks.add(new Todo("buy bread"));
+        return tasks;
+    }
+
+    @Test
+    public void parseIndex_firstTask_zeroReturned() throws MeowMeowException {
+        assertEquals(0, threeTasks().parseIndex("1", "mark"));
+    }
+
+    @Test
+    public void parseIndex_lastTask_correctIndexReturned() throws MeowMeowException {
+        assertEquals(2, threeTasks().parseIndex("3", "mark"));
+    }
+
+    @Test
+    public void parseIndex_emptyArgument_exceptionThrown() {
+        MeowMeowException e = assertThrows(MeowMeowException.class, ()
+                -> threeTasks().parseIndex("", "mark"));
+        assertTrue(e.getMessage().contains("mark"));
+    }
+
+    @Test
+    public void parseIndex_emptyList_exceptionThrown() {
+        MeowMeowException e = assertThrows(MeowMeowException.class, ()
+                -> new TaskList().parseIndex("1", "delete"));
+        assertTrue(e.getMessage().contains("empty"));
+    }
+
+    @Test
+    public void parseIndex_notANumber_exceptionThrown() {
+        assertThrows(MeowMeowException.class, () -> threeTasks().parseIndex("abc", "mark"));
+    }
+
+    @Test
+    public void parseIndex_zeroIndex_exceptionThrown() {
+        assertThrows(MeowMeowException.class, () -> threeTasks().parseIndex("0", "mark"));
+    }
+
+    @Test
+    public void parseIndex_negativeIndex_exceptionThrown() {
+        assertThrows(MeowMeowException.class, () -> threeTasks().parseIndex("-1", "mark"));
+    }
+
+    @Test
+    public void parseIndex_indexBeyondSize_exceptionThrown() {
+        assertThrows(MeowMeowException.class, () -> threeTasks().parseIndex("4", "mark"));
+    }
+
+    @Test
+    public void delete_middleTask_remainingTasksShift() {
+        TaskList tasks = threeTasks();
+        Task removed = tasks.delete(1);
+        assertEquals("[T][ ] return book", removed.toString());
+        assertEquals(2, tasks.size());
+        assertEquals("[T][ ] buy bread", tasks.get(1).toString());
+    }
+
+    @Test
+    public void asList_modifyingReturnedList_originalUnchanged() {
+        TaskList tasks = threeTasks();
+        tasks.asList().clear();
+        assertEquals(3, tasks.size());
+    }
+}

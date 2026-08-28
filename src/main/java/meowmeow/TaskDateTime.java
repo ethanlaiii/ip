@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 
 public class TaskDateTime {
     private static final DateTimeFormatter[] DATE_TIME_FORMATS = {
@@ -19,9 +20,9 @@ public class TaskDateTime {
     };
 
     private static final DateTimeFormatter OUTPUT_DATE =
-            DateTimeFormatter.ofPattern("MMM dd yyyy");
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
     private static final DateTimeFormatter OUTPUT_DATE_TIME =
-            DateTimeFormatter.ofPattern("MMM dd yyyy, h:mma");
+            DateTimeFormatter.ofPattern("MMM dd yyyy, h:mma", Locale.ENGLISH);
 
     private final LocalDateTime dateTime;
     private final boolean hasTime;
