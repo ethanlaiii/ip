@@ -130,10 +130,29 @@ public class MeowMeow {
                     storage.save(taskList);
                     printAdded(taskList);
                 }
+                case ON -> {
+                    if (arguments.isEmpty()) {
+                        throw new MeowMeowException("Which date? Try: on 2019-12-02");
+                    }
+                    LocalDate date = TaskDateTime.parse(arguments).toLocalDate();
+                    System.out.println(LINE);
+                    System.out.println("     Tasks on " + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
+                    int matches = 0;
+                    for (Task task : taskList) {
+                        if (task.occursOn(date)) {
+                            matches++;
+                            System.out.println("     " + matches + "." + task);
+                        }
+                    }
+                    if (matches == 0) {
+                        System.out.println("     Nothing scheduled. Enjoy the free time!");
+                    }
+                    System.out.println(LINE);
+                }
 
-                case UNKNOWN -> {
+                    case UNKNOWN -> {
                     throw new MeowMeowException("I don't know what \"" + commandWord + "\" means. "
-                            + "I understand: todo, deadline, event, list, mark, unmark, delete, bye");
+                            + "I understand: todo, deadline, event, list, mark, unmark, delete, on, bye");
                 }
                 }
             } catch (MeowMeowException e) {

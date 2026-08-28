@@ -7,6 +7,7 @@ public enum CommandType {
     MARK,
     UNMARK,
     DELETE,
+    ON,
     UNKNOWN;
 
     public static CommandType fromString(String input) {
