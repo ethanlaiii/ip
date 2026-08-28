@@ -132,4 +132,22 @@ public class TaskList {
         }
         return index;
     }
+
+    /**
+     * Returns the tasks whose descriptions contain the given keyword,
+     * ignoring case.
+     *
+     * @param keyword Text to search for.
+     * @return Matching tasks, in list order.
+     */
+    public ArrayList<Task> findByKeyword(String keyword) {
+        ArrayList<Task> matches = new ArrayList<>();
+        String lowerKeyword = keyword.toLowerCase();
+        for (Task task : tasks) {
+            if (task.matches(lowerKeyword)) {
+                matches.add(task);
+            }
+        }
+        return matches;
+    }
 }

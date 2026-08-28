@@ -65,6 +65,16 @@ public class Task {
         return false;
     }
 
+    /**
+     * Returns whether this task's description contains the given text.
+     *
+     * @param lowerKeyword Search text, already converted to lower case.
+     * @return True if the description contains the text, ignoring case.
+     */
+    public boolean matches(String lowerKeyword) {
+        return description.toLowerCase().contains(lowerKeyword);
+    }
+
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;

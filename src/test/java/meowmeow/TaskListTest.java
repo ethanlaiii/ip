@@ -75,4 +75,12 @@ public class TaskListTest {
         tasks.asList().clear();
         assertEquals(3, tasks.size());
     }
+
+    @Test
+    public void findByKeyword_matchingTasks_matchesReturnedInOrder() {
+        TaskList tasks = threeTasks();
+        assertEquals(2, tasks.findByKeyword("book").size());
+        assertEquals(1, tasks.findByKeyword("BREAD").size());
+        assertEquals(0, tasks.findByKeyword("xyz").size());
+    }
 }
