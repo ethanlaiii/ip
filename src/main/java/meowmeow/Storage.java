@@ -102,7 +102,8 @@ public class Storage {
                     if (parts.length < 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
                         return null;
                     }
-                    task = new Event(description, TaskDateTime.fromStorage(parts[3]), TaskDateTime.fromStorage(parts[4]));
+                    task = new Event(description, TaskDateTime.fromStorage(parts[3]),
+                            TaskDateTime.fromStorage(parts[4]));
                 }
                 default -> {
                     return null;
