@@ -2,9 +2,20 @@ package meowmeow;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a task that must be completed by a specific date or time.
+ */
 public class Deadline extends Task {
+
+    /** Date or time by which the task must be completed */
     protected TaskDateTime by;
 
+    /**
+     * Constructs a deadline with the given description and due date.
+     *
+     * @param description Description of the deadline.
+     * @param by Date or time the task is due.
+     */
     public Deadline(String description, TaskDateTime by) {
         super(description);
         this.by = by;

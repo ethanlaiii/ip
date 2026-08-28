@@ -6,6 +6,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
+/**
+ * Represents a date, optionally with a time, attached to a task.
+ * Accepts several input formats and renders dates in a readable form.
+ */
 public class TaskDateTime {
     private static final DateTimeFormatter[] DATE_TIME_FORMATS = {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"),
@@ -32,6 +36,15 @@ public class TaskDateTime {
         this.hasTime = hasTime;
     }
 
+    /**
+     * Returns a date parsed from user input.
+     * Accepts yyyy-MM-dd or d/M/yyyy, each optionally followed by a time
+     * in HHmm or HH:mm form.
+     *
+     * @param input Text typed by the user.
+     * @return Parsed date, with or without a time component.
+     * @throws MeowMeowException If the input matches none of the accepted formats.
+     */
     public static TaskDateTime parse(String input) throws MeowMeowException {
         String trimmed = input.trim();
 
@@ -56,6 +69,13 @@ public class TaskDateTime {
                 + "e.g. 2019-12-02 1800");
     }
 
+    /**
+     * Returns a date decoded from its stored representation.
+     *
+     * @param stored Text as written by {@link #toStorageFormat()}.
+     * @return Decoded date.
+     * @throws MeowMeowException If the stored text cannot be decoded.
+     */
     public static TaskDateTime fromStorage(String stored) throws MeowMeowException {
         try {
             if (stored.contains("T")) {
@@ -67,10 +87,21 @@ public class TaskDateTime {
         }
     }
 
+    /**
+     * Returns this date encoded for storage in the save file.
+     * The encoding preserves whether a time component was supplied.
+     *
+     * @return ISO-formatted date, with time if one was given.
+     */
     public String toStorageFormat() {
         return hasTime ? dateTime.toString() : dateTime.toLocalDate().toString();
     }
 
+    /**
+     * Returns the date part of this value, discarding any time component.
+     *
+     * @return The calendar date.
+     */
     public LocalDate toLocalDate() {
         return dateTime.toLocalDate();
     }
