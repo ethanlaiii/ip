@@ -8,8 +8,8 @@ import java.util.List;
 public class Storage {
     private final Path filePath;
 
-    public Storage() {
-        this.filePath = Paths.get("data", "meowmeow.txt");
+    public Storage(String filePath) {
+        this.filePath = Paths.get(filePath);
     }
 
     public ArrayList<Task> load() throws MeowMeowException {
