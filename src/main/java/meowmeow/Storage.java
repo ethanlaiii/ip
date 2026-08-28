@@ -7,13 +7,29 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles reading tasks from and writing tasks to a file on disk.
+ */
 public class Storage {
     private final Path filePath;
 
+    /**
+     * Constructs a storage handler for the file at the given path.
+     *
+     * @param filePath Path to the save file, relative to the project root.
+     */
     public Storage(String filePath) {
         this.filePath = Paths.get(filePath);
     }
 
+    /**
+     * Returns the tasks stored in the save file.
+     * Returns an empty list if the file does not exist. Lines that cannot be
+     * parsed are skipped, and the number skipped is reported to the user.
+     *
+     * @return Tasks loaded from disk.
+     * @throws MeowMeowException If the file exists but cannot be read.
+     */
     public ArrayList<Task> load() throws MeowMeowException {
         ArrayList<Task> tasks = new ArrayList<>();
 
@@ -48,6 +64,12 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Returns the task encoded by the given line, or null if the line is malformed.
+     *
+     * @param line Single line from the save file.
+     * @return Decoded task, or null if the line cannot be parsed.
+     */
     private Task parseLine(String line) {
         String[] parts = line.split("\\s*\\|\\s*");
 
@@ -96,6 +118,13 @@ public class Storage {
         return task;
     }
 
+    /**
+     * Writes the given tasks to the save file, overwriting any existing content.
+     * Creates the parent folder if it does not yet exist.
+     *
+     * @param tasks Tasks to write to disk.
+     * @throws MeowMeowException If the file cannot be written.
+     */
     public void save(ArrayList<Task> tasks) throws MeowMeowException {
         try {
             Path parent = filePath.getParent();

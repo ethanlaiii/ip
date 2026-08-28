@@ -2,12 +2,23 @@ package meowmeow;
 
 import java.time.LocalDate;
 
+/**
+ * Entry point for the MeowMeow chatbot.
+ * Reads commands from standard input, updates the task list, and persists
+ * changes to disk after every modification.
+ */
 public class MeowMeow {
 
     private final Ui ui;
     private final Storage storage;
     private TaskList tasks;
 
+    /**
+     * Constructs a chatbot that saves to and loads from the given file path.
+     * Starts with an empty task list if the file cannot be read.
+     *
+     * @param filePath Path to the save file, relative to the project root.
+     */
     public MeowMeow(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -19,6 +30,9 @@ public class MeowMeow {
         }
     }
 
+    /**
+     * Runs the command loop until the user exits.
+     */
     public void run() {
         ui.showWelcome();
         boolean isRunning = true;
@@ -90,6 +104,11 @@ public class MeowMeow {
         ui.close();
     }
 
+    /**
+     * Starts the chatbot.
+     *
+     * @param args Command line arguments, which are ignored.
+     */
     public static void main(String[] args) {
         new MeowMeow("data/meowmeow.txt").run();
     }
