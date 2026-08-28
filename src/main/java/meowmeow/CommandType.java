@@ -1,3 +1,5 @@
+package meowmeow;
+
 public enum CommandType {
     BYE,
     LIST,

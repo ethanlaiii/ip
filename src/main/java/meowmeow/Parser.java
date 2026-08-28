@@ -1,3 +1,5 @@
+package meowmeow;
+
 public class Parser {
 
     public static CommandType parseCommand(String input) {

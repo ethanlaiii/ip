@@ -1,4 +1,4 @@
-# MeowMeow User Guide
+# meowmeow.MeowMeow User Guide
 
 // Product screenshot goes here
 
