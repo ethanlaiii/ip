@@ -1,34 +1,25 @@
-import java.util.ArrayList;
-import java.util.Scanner;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
+import java.util.ArrayList;
 public class MeowMeow {
-    private static final String LINE = "    ____________________________________________________________";
-    private static final String LOGO = "  /\\_/\\\n"
-                                     + " ( o.o )\n"
-                                     + "  > ^ <\n";
 
     public static void main(String[] args) {
-        System.out.println(LINE);
-        System.out.println(LOGO);
-        System.out.println("     Hello! I'm MeowMeow.");
-        System.out.println("     What can I do for you? Meow :>");
-        System.out.println(LINE);
-
+        Ui ui = new Ui();
         Storage storage = new Storage();
+
+        ui.showWelcome();
+
         ArrayList<Task> taskList;
         try {
             taskList = storage.load();
         } catch (MeowMeowException e) {
-            printMessage(e.getMessage() + " Starting with an empty list.");
+            ui.showLoadingError(e.getMessage());
             taskList = new ArrayList<>();
         }
-        Scanner scanner = new Scanner(System.in);
+
         boolean isRunning = true;
 
         while (isRunning) {
-            String input = scanner.nextLine().trim();
+            String input = ui.readCommand();
             String[] words = input.split("\\s+", 2);
             String commandWord = words[0];
             CommandType command = CommandType.fromString(commandWord);
@@ -37,47 +28,33 @@ public class MeowMeow {
             try {
                 if (input.isEmpty()) {
                     throw new MeowMeowException("You didn't type anything. Give me something to work with!");
-
                 }
 
                 switch (command) {
                 case BYE -> {
-                    printMessage("Bye. Hope to see you again soon! Meow :>");
+                    ui.showFarewell();
                     isRunning = false;
                 }
                 case LIST -> {
-                    if (taskList.isEmpty()) {
-                        printMessage("Your list is empty. Nothing to do yet!");
-                    } else {
-                        System.out.println(LINE);
-                        System.out.println("     Here are the tasks in your list:");
-                        for (int i = 0; i < taskList.size(); i++) {
-                            System.out.println("     " + (i + 1) + "." + taskList.get(i));
-                        }
-                        System.out.println(LINE);
-                    }
+                    ui.showList(taskList);
                 }
                 case MARK -> {
                     int index = parseIndex(arguments, taskList.size(), "mark");
                     taskList.get(index).markAsDone();
                     storage.save(taskList);
-                    printTaskMessage("Nice! I've marked this task as done:", taskList.get(index));
+                    ui.showTaskMessage("Nice! I've marked this task as done:", taskList.get(index));
                 }
                 case UNMARK -> {
                     int index = parseIndex(arguments, taskList.size(), "unmark");
                     taskList.get(index).markAsNotDone();
                     storage.save(taskList);
-                    printTaskMessage("OK, I've marked this task as not done yet:", taskList.get(index));
+                    ui.showTaskMessage("OK, I've marked this task as not done yet:", taskList.get(index));
                 }
                 case DELETE -> {
                     int index = parseIndex(arguments, taskList.size(), "delete");
                     Task removed = taskList.remove(index);
                     storage.save(taskList);
-                    System.out.println(LINE);
-                    System.out.println("     Noted. I've removed this task:");
-                    System.out.println("       " + removed);
-                    System.out.println("     Now you have " + taskList.size() + " task(s) in the list.");
-                    System.out.println(LINE);
+                    ui.showRemoved(removed, taskList.size());
                 }
                 case TODO -> {
                     if (arguments.isEmpty()) {
@@ -85,7 +62,7 @@ public class MeowMeow {
                     }
                     taskList.add(new Todo(arguments));
                     storage.save(taskList);
-                    printAdded(taskList);
+                    ui.showAdded(taskList.getLast(), taskList.size());
                 }
                 case DEADLINE -> {
                     String[] parts = arguments.split("/by", 2);
@@ -101,7 +78,7 @@ public class MeowMeow {
                     TaskDateTime by = TaskDateTime.parse(parts[1].trim());
                     taskList.add(new Deadline(description, by));
                     storage.save(taskList);
-                    printAdded(taskList);
+                    ui.showAdded(taskList.getLast(), taskList.size());
                 }
                 case EVENT -> {
                     String[] fromParts = arguments.split("/from", 2);
@@ -128,39 +105,32 @@ public class MeowMeow {
                     TaskDateTime to = TaskDateTime.parse(toParts[1].trim());
                     taskList.add(new Event(description, from, to));
                     storage.save(taskList);
-                    printAdded(taskList);
+                    ui.showAdded(taskList.getLast(), taskList.size());
                 }
                 case ON -> {
                     if (arguments.isEmpty()) {
                         throw new MeowMeowException("Which date? Try: on 2019-12-02");
                     }
                     LocalDate date = TaskDateTime.parse(arguments).toLocalDate();
-                    System.out.println(LINE);
-                    System.out.println("     Tasks on " + date.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ":");
-                    int matches = 0;
+                    ArrayList<Task> matches = new ArrayList<>();
                     for (Task task : taskList) {
                         if (task.occursOn(date)) {
-                            matches++;
-                            System.out.println("     " + matches + "." + task);
+                            matches.add(task);
                         }
                     }
-                    if (matches == 0) {
-                        System.out.println("     Nothing scheduled. Enjoy the free time!");
-                    }
-                    System.out.println(LINE);
+                    ui.showTasksOn(date, matches);
                 }
-
-                    case UNKNOWN -> {
+                case UNKNOWN -> {
                     throw new MeowMeowException("I don't know what \"" + commandWord + "\" means. "
                             + "I understand: todo, deadline, event, list, mark, unmark, delete, on, bye");
                 }
                 }
             } catch (MeowMeowException e) {
-                printMessage(e.getMessage());
+                ui.showError(e.getMessage());
             }
         }
 
-        scanner.close();
+        ui.close();
     }
 
     private static int parseIndex(String arguments, int taskCount, String command) throws MeowMeowException {
@@ -183,25 +153,4 @@ public class MeowMeow {
         return index;
     }
 
-
-    private static void printMessage(String message) {
-        System.out.println(LINE);
-        System.out.println("     " + message);
-        System.out.println(LINE);
-    }
-
-    private static void printTaskMessage(String message, Task task) {
-        System.out.println(LINE);
-        System.out.println("     " + message);
-        System.out.println("       " + task);
-        System.out.println(LINE);
-    }
-
-    private static void printAdded(ArrayList<Task> taskList) {
-        System.out.println(LINE);
-        System.out.println("     Got it. I've added this task:");
-        System.out.println("       " + taskList.getLast());
-        System.out.println("     Now you have " + taskList.size() + " task(s) in the list.");
-        System.out.println(LINE);
-    }
 }
