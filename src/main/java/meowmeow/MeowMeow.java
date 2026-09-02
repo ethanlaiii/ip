@@ -9,9 +9,13 @@ import java.time.LocalDate;
  */
 public class MeowMeow {
 
+    private static final String DEFAULT_FILE_PATH = "data/meowmeow.txt";
+
     private final Ui ui;
     private final Storage storage;
     private TaskList tasks;
+    private String loadingError = null;
+    private boolean isExit = false;
 
     /**
      * Constructs a chatbot that saves to and loads from the given file path.
@@ -25,8 +29,116 @@ public class MeowMeow {
         try {
             tasks = new TaskList(storage.load());
         } catch (MeowMeowException e) {
-            ui.showLoadingError(e.getMessage());
+            loadingError = e.getMessage();
             tasks = new TaskList();
+        }
+    }
+
+    /**
+     * Constructs a chatbot using the default save file path.
+     */
+    public MeowMeow() {
+        this(DEFAULT_FILE_PATH);
+    }
+
+    /**
+     * Returns the greeting shown when the chatbot starts, including a
+     * warning if the save file could not be read.
+     *
+     * @return Welcome text.
+     */
+    public String getWelcome() {
+        if (loadingError != null) {
+            return ui.formatMessage(ui.formatLoadingError(loadingError), ui.formatWelcome());
+        }
+        return ui.formatWelcome();
+    }
+
+    /**
+     * Returns whether the user has asked to exit.
+     *
+     * @return True once the bye command has been given.
+     */
+    public boolean isExit() {
+        return isExit;
+    }
+
+    /**
+     * Returns the chatbot's reply to a single line of user input.
+     * Errors are returned as text rather than thrown, so that the caller
+     * can display them like any other response.
+     *
+     * @param input Raw command typed by the user.
+     * @return Text to show the user.
+     */
+    public String getResponse(String input) {
+        try {
+            if (input.isEmpty()) {
+                throw new MeowMeowException("You didn't type anything. Give me something to work with!");
+            }
+
+            CommandType command = Parser.parseCommand(input);
+            String arguments = Parser.parseArguments(input);
+
+            switch (command) {
+                case BYE -> {
+                    isExit = true;
+                    return ui.formatFarewell();
+                }
+                case LIST -> {
+                    return ui.formatList(tasks.asList());
+                }
+                case MARK -> {
+                    int index = tasks.parseIndex(arguments, "mark");
+                    tasks.markAsDone(index);
+                    storage.save(tasks.asList());
+                    return ui.formatTaskMessage("Nice! I've marked this task as done:", tasks.get(index));
+                }
+                case UNMARK -> {
+                    int index = tasks.parseIndex(arguments, "unmark");
+                    tasks.markAsNotDone(index);
+                    storage.save(tasks.asList());
+                    return ui.formatTaskMessage("OK, I've marked this task as not done yet:", tasks.get(index));
+                }
+                case DELETE -> {
+                    int index = tasks.parseIndex(arguments, "delete");
+                    Task removed = tasks.delete(index);
+                    storage.save(tasks.asList());
+                    return ui.formatRemoved(removed, tasks.size());
+                }
+                case TODO -> {
+                    Task added = tasks.add(Parser.parseTodo(arguments));
+                    storage.save(tasks.asList());
+                    return ui.formatAdded(added, tasks.size());
+                }
+                case DEADLINE -> {
+                    Task added = tasks.add(Parser.parseDeadline(arguments));
+                    storage.save(tasks.asList());
+                    return ui.formatAdded(added, tasks.size());
+                }
+                case EVENT -> {
+                    Task added = tasks.add(Parser.parseEvent(arguments));
+                    storage.save(tasks.asList());
+                    return ui.formatAdded(added, tasks.size());
+                }
+                case ON -> {
+                    LocalDate date = Parser.parseDate(arguments).toLocalDate();
+                    return ui.formatTasksOn(date, tasks.findOccurringOn(date));
+                }
+                case FIND -> {
+                    if (arguments.isEmpty()) {
+                        throw new MeowMeowException("What should I search for? Try: find book");
+                    }
+                    return ui.formatMatches(tasks.findByKeyword(arguments));
+                }
+                case UNKNOWN -> throw new MeowMeowException(
+                        "I don't know what \"" + Parser.parseCommandWord(input) + "\" means. "
+                                + "I understand: todo, deadline, event, list, mark, unmark, delete, on, find, bye");
+                default -> throw new MeowMeowException("Something went wrong. Meow?");
+            }
+
+        } catch (MeowMeowException e) {
+            return ui.formatError(e.getMessage());
         }
     }
 
@@ -34,88 +146,19 @@ public class MeowMeow {
      * Runs the command loop until the user exits.
      */
     public void run() {
-        ui.showWelcome();
-        boolean isRunning = true;
-
-        while (isRunning) {
-            String input = ui.readCommand();
-
-            try {
-                if (input.isEmpty()) {
-                    throw new MeowMeowException("You didn't type anything. Give me something to work with!");
-                }
-
-                CommandType command = Parser.parseCommand(input);
-                String arguments = Parser.parseArguments(input);
-
-                switch (command) {
-                    case BYE -> {
-                        ui.showFarewell();
-                        isRunning = false;
-                    }
-                    case LIST -> ui.showList(tasks.asList());
-                    case MARK -> {
-                        int index = tasks.parseIndex(arguments, "mark");
-                        tasks.markAsDone(index);
-                        storage.save(tasks.asList());
-                        ui.showTaskMessage("Nice! I've marked this task as done:", tasks.get(index));
-                    }
-                    case UNMARK -> {
-                        int index = tasks.parseIndex(arguments, "unmark");
-                        tasks.markAsNotDone(index);
-                        storage.save(tasks.asList());
-                        ui.showTaskMessage("OK, I've marked this task as not done yet:", tasks.get(index));
-                    }
-                    case DELETE -> {
-                        int index = tasks.parseIndex(arguments, "delete");
-                        Task removed = tasks.delete(index);
-                        storage.save(tasks.asList());
-                        ui.showRemoved(removed, tasks.size());
-                    }
-                    case TODO -> {
-                        Task added = tasks.add(Parser.parseTodo(arguments));
-                        storage.save(tasks.asList());
-                        ui.showAdded(added, tasks.size());
-                    }
-                    case DEADLINE -> {
-                        Task added = tasks.add(Parser.parseDeadline(arguments));
-                        storage.save(tasks.asList());
-                        ui.showAdded(added, tasks.size());
-                    }
-                    case EVENT -> {
-                        Task added = tasks.add(Parser.parseEvent(arguments));
-                        storage.save(tasks.asList());
-                        ui.showAdded(added, tasks.size());
-                    }
-                    case ON -> {
-                        LocalDate date = Parser.parseDate(arguments).toLocalDate();
-                        ui.showTasksOn(date, tasks.findOccurringOn(date));
-                    }
-                    case FIND -> {
-                        if (arguments.isEmpty()) {
-                            throw new MeowMeowException("What should I search for? Try: find book");
-                        }
-                        ui.showMatches(tasks.findByKeyword(arguments));
-                    }
-                    case UNKNOWN -> throw new MeowMeowException(
-                            "I don't know what \"" + Parser.parseCommandWord(input) + "\" means. "
-                                    + "I understand: todo, deadline, event, list, mark, unmark, delete, on, find, bye");
-                }
-
-            } catch (MeowMeowException e) {
-                ui.showError(e.getMessage());
-            }
+        ui.printToConsole(getWelcome());
+        while (!isExit) {
+            ui.printToConsole(getResponse(ui.readCommand()));
         }
-
         ui.close();
     }
 
     /**
-     * Starts the chatbot.
+     * Starts the console version of chatbot.
      *
      * @param args Command line arguments, which are ignored.
      */
     public static void main(String[] args) {
-        new MeowMeow("data/meowmeow.txt").run();
+        new MeowMeow(DEFAULT_FILE_PATH).run();
     }
 }
