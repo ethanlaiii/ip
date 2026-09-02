@@ -1,7 +1,7 @@
 package meowmeow;
 
-import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -10,7 +10,6 @@ import java.util.Scanner;
  * from standard input and formatting output to standard output.
  */
 public class Ui {
-    // ... constants and scanner field unchanged
     private static final String LINE = "    ____________________________________________________________";
     private static final String LOGO = "  /\\_/\\\n"
             + " ( o.o )\n"
@@ -70,13 +69,15 @@ public class Ui {
     }
 
     /**
-     * Prints a single message framed by divider lines.
+     * Prints the given lines framed by divider lines.
      *
-     * @param message Text to show the user.
+     * @param lines Lines of text to show the user.
      */
-    public void showMessage(String message) {
+    public void showMessage(String... lines) {
         showLine();
-        System.out.println("     " + message);
+        for (String line : lines) {
+            System.out.println("     " + line);
+        }
         showLine();
     }
 
@@ -105,10 +106,7 @@ public class Ui {
      * @param task Task the message refers to.
      */
     public void showTaskMessage(String message, Task task) {
-        showLine();
-        System.out.println("     " + message);
-        System.out.println("       " + task);
-        showLine();
+        showMessage(message, "  " + task);
     }
 
     /**
@@ -118,11 +116,9 @@ public class Ui {
      * @param totalCount Number of tasks in the list after the addition.
      */
     public void showAdded(Task task, int totalCount) {
-        showLine();
-        System.out.println("     Got it. I've added this task:");
-        System.out.println("       " + task);
-        System.out.println("     Now you have " + totalCount + " task(s) in the list.");
-        showLine();
+        showMessage("Got it. I've added this task:",
+                "  " + task,
+                "Now you have " + totalCount + " task(s) in the list.");
     }
 
     /**
@@ -132,11 +128,9 @@ public class Ui {
      * @param totalCount Number of tasks remaining in the list.
      */
     public void showRemoved(Task task, int totalCount) {
-        showLine();
-        System.out.println("     Noted. I've removed this task:");
-        System.out.println("       " + task);
-        System.out.println("     Now you have " + totalCount + " task(s) in the list.");
-        showLine();
+        showMessage("Noted. I've removed this task:",
+                "  " + task,
+                "Now you have " + totalCount + " task(s) in the list.");
     }
 
     /**
