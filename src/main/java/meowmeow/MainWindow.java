@@ -1,5 +1,7 @@
 package meowmeow;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -7,7 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-
+import javafx.util.Duration;
 /**
  * Controller for the main GUI.
  */
@@ -25,6 +27,7 @@ public class MainWindow extends AnchorPane {
 
     private Image userImage = new Image(this.getClass().getResourceAsStream("/images/Meow2.JPG"));
     private Image meowMeowImage = new Image(this.getClass().getResourceAsStream("/images/Meow1.jpg"));
+    private static final Duration EXIT_DELAY = Duration.seconds(2);
 
     @FXML
     public void initialize() {
@@ -57,5 +60,21 @@ public class MainWindow extends AnchorPane {
                 DialogBox.getMeowMeowDialog(response, meowMeowImage)
         );
         userInput.clear();
+
+        if (meowMeow.isExit()) {
+            exitAfterDelay();
+        }
+    }
+
+    /**
+     * Closes the window once the farewell message has been on screen long enough to read.
+     */
+    private void exitAfterDelay() {
+        userInput.setDisable(true);
+        sendButton.setDisable(true);
+
+        PauseTransition delay = new PauseTransition(EXIT_DELAY);
+        delay.setOnFinished(event -> Platform.exit());
+        delay.play();
     }
 }
