@@ -6,8 +6,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Handles all interaction with the user, including reading commands
- * from standard input and formatting output to standard output.
+ * Builds the text shown to the user and reads commands in console mode.
+ * Formatting methods return strings so that the same text can be printed
+ * to the console or displayed in a graphical interface.
  */
 public class Ui {
     private static final String LINE = "    ____________________________________________________________";
@@ -44,147 +45,155 @@ public class Ui {
     }
 
     /**
-     * Prints a horizontal divider line.
+     * Prints the response to the console with divider lines.
+     *
+     * @param response Text to print, which may span several lines.
      */
-    public void showLine() {
+    public void printToConsole(String response) {
+        System.out.println(LINE);
+        for (String line : response.split("\n")) {
+            System.out.println("     " + line);
+        }
         System.out.println(LINE);
     }
 
     /**
-     * Prints the logo and welcome greeting shown at startup.
-     */
-    public void showWelcome() {
-        showLine();
-        System.out.println(LOGO);
-        System.out.println("     Hello! I'm MeowMeow.");
-        System.out.println("     What can I do for you? Meow :>");
-        showLine();
-    }
-
-    /**
-     * Prints the farewell message shown before the app exits.
-     */
-    public void showFarewell() {
-        showMessage("Bye. Hope to see you again soon! Meow :>");
-    }
-
-    /**
-     * Prints the given lines framed by divider lines.
+     * Returns the lines joined into a single response.
      *
      * @param lines Lines of text to show the user.
+     * @return The lines separated by new lines.
      */
-    public void showMessage(String... lines) {
-        showLine();
-        for (String line : lines) {
-            System.out.println("     " + line);
-        }
-        showLine();
+    public String formatMessage(String... lines) {
+        return String.join("\n", lines);
+    }
+
+
+    /**
+     * Returns the logo and greeting shown when the chatbot starts.
+     *
+     * @return Welcome text.
+     */
+    public String formatWelcome() {
+        return formatMessage(LOGO, "Hello! I'm MeowMeow.", "What can I do for you? Meow :>");
     }
 
     /**
-     * Prints an error message to the user.
+     * Returns the farewell message shown before the chatbot exits.
+     *
+     * @return Farewell text.
+     */
+    public String formatFarewell() {
+        return formatMessage("Bye. Hope to see you again soon! Meow :>");
+    }
+
+
+    /**
+     * Returns the given error message formatted for display.
      *
      * @param message Explanation of what went wrong.
+     * @return Error text.
      */
-    public void showError(String message) {
-        showMessage(message);
+    public String formatError(String message) {
+        return message;
     }
 
     /**
-     * Prints a warning that the save file could not be read.
+     * Returns a warning that the save file could not be read.
      *
      * @param message Explanation of the loading failure.
+     * @return Warning text.
      */
-    public void showLoadingError(String message) {
-        showMessage(message + " Starting with an empty list.");
+    public String formatLoadingError(String message) {
+        return formatMessage(message + " Starting with an empty list.");
     }
 
     /**
-     * Prints a message followed by the task it refers to.
+     * Returns a message followed by the task it refers to.
      *
      * @param message Text describing what happened to the task.
      * @param task Task the message refers to.
+     * @return Message text with the task on its own line.
      */
-    public void showTaskMessage(String message, Task task) {
-        showMessage(message, "  " + task);
+    public String formatTaskMessage(String message, Task task) {
+        return formatMessage(message, "  " + task);
     }
 
     /**
-     * Prints confirmation that a task was added, along with the new list size.
+     * Returns confirmation that a task was added, along with the new list size.
      *
      * @param task Task that was added.
      * @param totalCount Number of tasks in the list after the addition.
+     * @return Confirmation text.
      */
-    public void showAdded(Task task, int totalCount) {
-        showMessage("Got it. I've added this task:",
+    public String formatAdded(Task task, int totalCount) {
+        return formatMessage("Got it. I've added this task:",
                 "  " + task,
                 "Now you have " + totalCount + " task(s) in the list.");
     }
 
     /**
-     * Prints confirmation that a task was removed, along with the new list size.
+     * Returns confirmation that a task was removed, along with the new list size.
      *
      * @param task Task that was removed.
      * @param totalCount Number of tasks remaining in the list.
+     * @return Confirmation text.
      */
-    public void showRemoved(Task task, int totalCount) {
-        showMessage("Noted. I've removed this task:",
+    public String formatRemoved(Task task, int totalCount) {
+        return formatMessage("Noted. I've removed this task:",
                 "  " + task,
                 "Now you have " + totalCount + " task(s) in the list.");
     }
 
     /**
-     * Prints the given tasks as a numbered list, or a message if there are none.
+     * Returns the given tasks as a numbered list, or a message if there are none.
      *
      * @param tasks Tasks to display.
+     * @return Numbered list text.
      */
-    public void showList(ArrayList<Task> tasks) {
+    public String formatList(ArrayList<Task> tasks) {
         if (tasks.isEmpty()) {
-            showMessage("Your list is empty. Nothing to do yet!");
-            return;
+            return "Your list is empty. Nothing to do yet!";
         }
-        showLine();
-        System.out.println("     Here are the tasks in your list:");
+        StringBuilder builder = new StringBuilder("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println("     " + (i + 1) + "." + tasks.get(i));
+            builder.append("\n").append(i + 1).append(".").append(tasks.get(i));
         }
-        showLine();
+        return builder.toString();
     }
 
     /**
-     * Prints the tasks occurring on the given date, or a message if there are none.
+     * Returns the tasks occurring on the given date, or a message if there are none.
      *
      * @param date Date the tasks were filtered by.
      * @param matches Tasks occurring on that date.
+     * @return Numbered list text with a date heading.
      */
-    public void showTasksOn(LocalDate date, ArrayList<Task> matches) {
-        showLine();
-        System.out.println("     Tasks on " + date.format(DATE_HEADING) + ":");
+    public String formatTasksOn(LocalDate date, ArrayList<Task> matches) {
+        StringBuilder builder = new StringBuilder("Tasks on " + date.format(DATE_HEADING) + ":");
         if (matches.isEmpty()) {
-            System.out.println("     Nothing scheduled. Enjoy the free time!");
+            builder.append("\nNothing scheduled. Enjoy the free time!");
         } else {
             for (int i = 0; i < matches.size(); i++) {
-                System.out.println("     " + (i + 1) + "." + matches.get(i));
+                builder.append("\n").append(i + 1).append(".").append(matches.get(i));
             }
         }
-        showLine();
+        return builder.toString();
     }
 
     /**
-     * Prints the tasks matching a search, or a message if there are none.
+     * Returns the tasks matching a search, or a message if there are none.
      *
      * @param matches Tasks whose descriptions matched the keyword.
+     * @return Numbered list text of matching tasks.
      */
-    public void showMatches(ArrayList<Task> matches) {
-        showLine();
+    public String formatMatches(ArrayList<Task> matches) {
         if (matches.isEmpty()) {
-            System.out.println("     No matching tasks found. Meow?");
-        } else {
-            System.out.println("     Here are the matching tasks in your list:");
-            for (int i = 0; i < matches.size(); i++) {
-                System.out.println("     " + (i + 1) + "." + matches.get(i));
-            }
+            return "No matching tasks found. Meow?";
         }
-        showLine();
+        StringBuilder builder = new StringBuilder("Here are the matching tasks in your list:");
+        for (int i = 0; i < matches.size(); i++) {
+            builder.append("\n").append(i + 1).append(".").append(matches.get(i));
+        }
+        return builder.toString();
     }
 }
