@@ -33,11 +33,15 @@ public class MainWindow extends AnchorPane {
 
     /**
      * Injects the MeowMeow instance.
+     * Injects the MeowMeow instance and shows its greeting.
      *
      * @param m Chatbot instance to route user input to.
      */
     public void setMeowMeow(MeowMeow m) {
         meowMeow = m;
+        dialogContainer.getChildren().add(
+                DialogBox.getMeowMeowDialog(meowMeow.getWelcome(), meowMeowImage)
+        );
     }
 
     /**
