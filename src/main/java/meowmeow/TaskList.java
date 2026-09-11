@@ -2,6 +2,7 @@ package meowmeow;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Holds the collection of tasks and provides operations to query and modify it.
@@ -94,13 +95,9 @@ public class TaskList {
      * @return Tasks occurring on that date, in list order.
      */
     public ArrayList<Task> findOccurringOn(LocalDate date) {
-        ArrayList<Task> matches = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.occursOn(date)) {
-                matches.add(task);
-            }
-        }
-        return matches;
+        return tasks.stream()
+                .filter(task -> task.occursOn(date))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -141,13 +138,9 @@ public class TaskList {
      * @return Matching tasks, in list order.
      */
     public ArrayList<Task> findByKeyword(String keyword) {
-        ArrayList<Task> matches = new ArrayList<>();
         String lowerKeyword = keyword.toLowerCase();
-        for (Task task : tasks) {
-            if (task.matches(lowerKeyword)) {
-                matches.add(task);
-            }
-        }
-        return matches;
+        return tasks.stream()
+                .filter(task -> task.matches(lowerKeyword))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }
