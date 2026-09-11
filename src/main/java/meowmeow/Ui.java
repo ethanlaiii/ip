@@ -12,6 +12,7 @@ import java.util.Scanner;
  */
 public class Ui {
     private static final String LINE = "    ____________________________________________________________";
+    private static final String TASK_INDENT = "  ";
     private static final String LOGO = "  /\\_/\\\n"
             + " ( o.o )\n"
             + "  > ^ <\n";
@@ -115,7 +116,7 @@ public class Ui {
      * @return Message text with the task on its own line.
      */
     public String formatTaskMessage(String message, Task task) {
-        return formatMessage(message, "  " + task);
+        return formatMessage(message, TASK_INDENT + task);
     }
 
     /**
@@ -127,7 +128,7 @@ public class Ui {
      */
     public String formatAdded(Task task, int totalCount) {
         return formatMessage("Got it. I've added this task:",
-                "  " + task,
+                TASK_INDENT + task,
                 "Now you have " + totalCount + " task(s) in the list.");
     }
 
@@ -140,7 +141,7 @@ public class Ui {
      */
     public String formatRemoved(Task task, int totalCount) {
         return formatMessage("Noted. I've removed this task:",
-                "  " + task,
+                TASK_INDENT + task,
                 "Now you have " + totalCount + " task(s) in the list.");
     }
 

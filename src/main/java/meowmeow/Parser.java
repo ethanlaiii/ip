@@ -70,7 +70,6 @@ public class Parser {
      * @throws MeowMeowException If the description is missing, the /by
      *         delimiter is absent, or the date cannot be parsed.
      */
-
     public static Deadline parseDeadline(String arguments) throws MeowMeowException {
         String example = "Try: deadline return book /by 2019-12-02 1800";
         String[] parts = arguments.split("/by", 2);
