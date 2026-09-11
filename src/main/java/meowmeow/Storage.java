@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Handles reading tasks from and writing tasks to a file on disk.
@@ -134,12 +135,11 @@ public class Storage {
                 Files.createDirectories(parent);
             }
 
-            StringBuilder builder = new StringBuilder();
-            for (Task task : tasks) {
-                builder.append(task.toFileFormat()).append(System.lineSeparator());
-            }
+            String data = tasks.stream()
+                    .map(task -> task.toFileFormat() + System.lineSeparator())
+                    .collect(Collectors.joining());
 
-            Files.writeString(filePath, builder.toString());
+            Files.writeString(filePath, data);
         } catch (IOException e) {
             throw new MeowMeowException("I couldn't save your tasks: " + e.getMessage());
         }
