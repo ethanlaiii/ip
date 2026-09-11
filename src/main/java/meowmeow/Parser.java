@@ -12,8 +12,17 @@ public class Parser {
      * @return Matching command type, or {@code UNKNOWN} if unrecognised.
      */
     public static CommandType parseCommand(String input) {
-        String[] words = input.trim().split("\\s+", 2);
-        return CommandType.fromString(words[0]);
+        return CommandType.fromString(parseCommandWord(input));
+    }
+
+    /**
+     * Returns the input split into the command word and the remaining text.
+     *
+     * @param input Full line of user input.
+     * @return One or two elements: the command word, then any argument text.
+     */
+    private static String[] splitCommandAndArguments(String input) {
+        return input.trim().split("\\s+", 2);
     }
 
     /**
@@ -23,8 +32,7 @@ public class Parser {
      * @return The command word.
      */
     public static String parseCommandWord(String input) {
-        String[] words = input.trim().split("\\s+", 2);
-        return words[0];
+        return splitCommandAndArguments(input)[0];
     }
 
     /**
@@ -35,8 +43,8 @@ public class Parser {
      * @return Trimmed argument text.
      */
     public static String parseArguments(String input) {
-        String[] words = input.trim().split("\\s+", 2);
-        return (words.length > 1) ? words[1].trim() : "";
+        String[] parts = splitCommandAndArguments(input);
+        return (parts.length > 1) ? parts[1].trim() : "";
     }
 
     /**
@@ -62,7 +70,6 @@ public class Parser {
      * @throws MeowMeowException If the description is missing, the /by
      *         delimiter is absent, or the date cannot be parsed.
      */
-
     public static Deadline parseDeadline(String arguments) throws MeowMeowException {
         String example = "Try: deadline return book /by 2019-12-02 1800";
         String[] parts = arguments.split("/by", 2);
