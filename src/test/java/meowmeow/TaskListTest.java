@@ -1,6 +1,7 @@
 package meowmeow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -82,5 +83,40 @@ public class TaskListTest {
         assertEquals(2, tasks.findByKeyword("book").size());
         assertEquals(1, tasks.findByKeyword("BREAD").size());
         assertEquals(0, tasks.findByKeyword("xyz").size());
+    }
+
+    @Test
+    public void hasDuplicateOf_sameDescription_returnsTrue() {
+        assertTrue(threeTasks().hasDuplicateOf(new Todo("read book")));
+    }
+
+    @Test
+    public void hasDuplicateOf_differentCase_returnsTrue() {
+        assertTrue(threeTasks().hasDuplicateOf(new Todo("READ BOOK")));
+    }
+
+    @Test
+    public void hasDuplicateOf_unseenDescription_returnsFalse() {
+        assertFalse(threeTasks().hasDuplicateOf(new Todo("read magazine")));
+    }
+
+    @Test
+    public void hasDuplicateOf_sameDescriptionDifferentType_returnsFalse() throws MeowMeowException {
+        Deadline deadline = new Deadline("read book", TaskDateTime.parse("2019-12-02"));
+        assertFalse(threeTasks().hasDuplicateOf(deadline));
+    }
+
+    @Test
+    public void hasDuplicateOf_deadlineWithSameDate_returnsTrue() throws MeowMeowException {
+        TaskList tasks = new TaskList();
+        tasks.add(new Deadline("submit report", TaskDateTime.parse("2019-12-02")));
+        assertTrue(tasks.hasDuplicateOf(new Deadline("submit report", TaskDateTime.parse("2019-12-02"))));
+    }
+
+    @Test
+    public void hasDuplicateOf_deadlineWithDifferentDate_returnsFalse() throws MeowMeowException {
+        TaskList tasks = new TaskList();
+        tasks.add(new Deadline("submit report", TaskDateTime.parse("2019-12-02")));
+        assertFalse(tasks.hasDuplicateOf(new Deadline("submit report", TaskDateTime.parse("2019-12-03"))));
     }
 }

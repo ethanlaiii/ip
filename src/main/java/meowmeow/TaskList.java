@@ -149,4 +149,14 @@ public class TaskList {
                 .filter(task -> task.matches(lowerKeyword))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
+
+    /**
+     * Returns whether this list already contains a duplicate of the given task.
+     *
+     * @param task Task to look for.
+     * @return True if an equivalent task is already in the list.
+     */
+    public boolean hasDuplicateOf(Task task) {
+        return tasks.stream().anyMatch(existing -> existing.isDuplicateOf(task));
+    }
 }

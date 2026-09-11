@@ -75,6 +75,20 @@ public class Task {
         return description.toLowerCase().contains(lowerKeyword);
     }
 
+    /**
+     * Returns whether this task represents the same work as the given task.
+     * Tasks of different types are never duplicates. Completion status is
+     * ignored, so re-adding a finished task is still reported as a duplicate.
+     *
+     * @param other Task to compare against.
+     * @return True if both tasks describe the same work.
+     */
+    public boolean isDuplicateOf(Task other) {
+        return other != null
+                && getClass() == other.getClass()
+                && description.equalsIgnoreCase(other.description);
+    }
+
     @Override
     public String toString() {
         return "[" + getStatusIcon() + "] " + description;

@@ -39,4 +39,13 @@ public class Event extends Task {
     public String toFileFormat() {
         return "E | " + super.toFileFormat() + " | " + from.toStorageFormat() + " | " + to.toStorageFormat();
     }
+
+    @Override
+    public boolean isDuplicateOf(Task other) {
+        if (!super.isDuplicateOf(other)) {
+            return false;
+        }
+        Event otherEvent = (Event) other;
+        return from.equals(otherEvent.from) && to.equals(otherEvent.to);
+    }
 }
