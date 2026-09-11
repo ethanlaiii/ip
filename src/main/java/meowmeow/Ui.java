@@ -127,9 +127,7 @@ public class Ui {
      * @return Confirmation text.
      */
     public String formatAdded(Task task, int totalCount) {
-        return formatMessage("Got it. I've added this task:",
-                TASK_INDENT + task,
-                "Now you have " + totalCount + " task(s) in the list.");
+        return formatTaskCountMessage("Meow! Got it. I've added this task:", task, totalCount);
     }
 
     /**
@@ -140,9 +138,7 @@ public class Ui {
      * @return Confirmation text.
      */
     public String formatRemoved(Task task, int totalCount) {
-        return formatMessage("Noted. I've removed this task:",
-                TASK_INDENT + task,
-                "Now you have " + totalCount + " task(s) in the list.");
+        return formatTaskCountMessage("Meow! Noted. I've removed this task:", task, totalCount);
     }
 
     /**
@@ -200,5 +196,19 @@ public class Ui {
             builder.append("\n").append(i + 1).append(".").append(tasks.get(i));
         }
         return builder.toString();
+    }
+
+    /**
+     * Returns a message about a task, followed by the resulting list size.
+     *
+     * @param message Text describing what happened to the task.
+     * @param task Task the message refers to.
+     * @param totalCount Number of tasks in the list afterwards.
+     * @return Message text with the task and the new list size.
+     */
+    private String formatTaskCountMessage(String message, Task task, int totalCount) {
+        return formatMessage(message,
+                TASK_INDENT + task,
+                "Now you have " + totalCount + " task(s) in the list.");
     }
 }
