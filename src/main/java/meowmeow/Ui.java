@@ -12,6 +12,7 @@ import java.util.Scanner;
  */
 public class Ui {
     private static final String LINE = "    ____________________________________________________________";
+    private static final String TASK_INDENT = "  ";
     private static final String LOGO = "  /\\_/\\\n"
             + " ( o.o )\n"
             + "  > ^ <\n";
@@ -115,7 +116,7 @@ public class Ui {
      * @return Message text with the task on its own line.
      */
     public String formatTaskMessage(String message, Task task) {
-        return formatMessage(message, "  " + task);
+        return formatMessage(message, TASK_INDENT + task);
     }
 
     /**
@@ -126,9 +127,7 @@ public class Ui {
      * @return Confirmation text.
      */
     public String formatAdded(Task task, int totalCount) {
-        return formatMessage("Got it. I've added this task:",
-                "  " + task,
-                "Now you have " + totalCount + " task(s) in the list.");
+        return formatTaskCountMessage("Meow! Got it. I've added this task:", task, totalCount);
     }
 
     /**
@@ -139,9 +138,7 @@ public class Ui {
      * @return Confirmation text.
      */
     public String formatRemoved(Task task, int totalCount) {
-        return formatMessage("Noted. I've removed this task:",
-                "  " + task,
-                "Now you have " + totalCount + " task(s) in the list.");
+        return formatTaskCountMessage("Meow! Noted. I've removed this task:", task, totalCount);
     }
 
     /**
@@ -154,11 +151,7 @@ public class Ui {
         if (tasks.isEmpty()) {
             return "Your list is empty. Nothing to do yet!";
         }
-        StringBuilder builder = new StringBuilder("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            builder.append("\n").append(i + 1).append(".").append(tasks.get(i));
-        }
-        return builder.toString();
+        return formatNumberedTasks("Here are the tasks in your list:", tasks);
     }
 
     /**
@@ -169,15 +162,12 @@ public class Ui {
      * @return Numbered list text with a date heading.
      */
     public String formatTasksOn(LocalDate date, ArrayList<Task> matches) {
-        StringBuilder builder = new StringBuilder("Tasks on " + date.format(DATE_HEADING) + ":");
+        String heading = "Tasks on " + date.format(DATE_HEADING) + ":";
         if (matches.isEmpty()) {
-            builder.append("\nNothing scheduled. Enjoy the free time!");
-        } else {
-            for (int i = 0; i < matches.size(); i++) {
-                builder.append("\n").append(i + 1).append(".").append(matches.get(i));
-            }
+            return formatMessage(heading, "Nothing scheduled. Enjoy the free time! Meow :>");
         }
-        return builder.toString();
+        return formatNumberedTasks(heading, matches);
+
     }
 
     /**
@@ -190,10 +180,35 @@ public class Ui {
         if (matches.isEmpty()) {
             return "No matching tasks found. Meow?";
         }
-        StringBuilder builder = new StringBuilder("Here are the matching tasks in your list:");
-        for (int i = 0; i < matches.size(); i++) {
-            builder.append("\n").append(i + 1).append(".").append(matches.get(i));
+        return formatNumberedTasks("Here are the matching tasks in your list:", matches);
+    }
+
+    /**
+     * Returns the given tasks as numbered lines beneath the given heading.
+     *
+     * @param heading Line introducing the list.
+     * @param tasks Tasks to number, in display order.
+     * @return Heading followed by one numbered line per task.
+     */
+    private String formatNumberedTasks(String heading, ArrayList<Task> tasks) {
+        StringBuilder builder = new StringBuilder(heading);
+        for (int i = 0; i < tasks.size(); i++) {
+            builder.append("\n").append(i + 1).append(".").append(tasks.get(i));
         }
         return builder.toString();
+    }
+
+    /**
+     * Returns a message about a task, followed by the resulting list size.
+     *
+     * @param message Text describing what happened to the task.
+     * @param task Task the message refers to.
+     * @param totalCount Number of tasks in the list afterwards.
+     * @return Message text with the task and the new list size.
+     */
+    private String formatTaskCountMessage(String message, Task task, int totalCount) {
+        return formatMessage(message,
+                TASK_INDENT + task,
+                "Now you have " + totalCount + " task(s) in the list.");
     }
 }
