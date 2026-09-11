@@ -154,11 +154,7 @@ public class Ui {
         if (tasks.isEmpty()) {
             return "Your list is empty. Nothing to do yet!";
         }
-        StringBuilder builder = new StringBuilder("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            builder.append("\n").append(i + 1).append(".").append(tasks.get(i));
-        }
-        return builder.toString();
+        return formatNumberedTasks("Here are the tasks in your list:", tasks);
     }
 
     /**
@@ -169,15 +165,12 @@ public class Ui {
      * @return Numbered list text with a date heading.
      */
     public String formatTasksOn(LocalDate date, ArrayList<Task> matches) {
-        StringBuilder builder = new StringBuilder("Tasks on " + date.format(DATE_HEADING) + ":");
+        String heading = "Tasks on " + date.format(DATE_HEADING) + ":";
         if (matches.isEmpty()) {
-            builder.append("\nNothing scheduled. Enjoy the free time!");
-        } else {
-            for (int i = 0; i < matches.size(); i++) {
-                builder.append("\n").append(i + 1).append(".").append(matches.get(i));
-            }
+            return formatMessage(heading, "Nothing scheduled. Enjoy the free time! Meow :>");
         }
-        return builder.toString();
+        return formatNumberedTasks(heading, matches);
+
     }
 
     /**
@@ -190,9 +183,20 @@ public class Ui {
         if (matches.isEmpty()) {
             return "No matching tasks found. Meow?";
         }
-        StringBuilder builder = new StringBuilder("Here are the matching tasks in your list:");
-        for (int i = 0; i < matches.size(); i++) {
-            builder.append("\n").append(i + 1).append(".").append(matches.get(i));
+        return formatNumberedTasks("Here are the matching tasks in your list:", matches);
+    }
+
+    /**
+     * Returns the given tasks as numbered lines beneath the given heading.
+     *
+     * @param heading Line introducing the list.
+     * @param tasks Tasks to number, in display order.
+     * @return Heading followed by one numbered line per task.
+     */
+    private String formatNumberedTasks(String heading, ArrayList<Task> tasks) {
+        StringBuilder builder = new StringBuilder(heading);
+        for (int i = 0; i < tasks.size(); i++) {
+            builder.append("\n").append(i + 1).append(".").append(tasks.get(i));
         }
         return builder.toString();
     }
