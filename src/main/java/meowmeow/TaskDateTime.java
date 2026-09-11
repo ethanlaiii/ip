@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 import java.util.Locale;
 
 /**
@@ -109,5 +110,21 @@ public class TaskDateTime {
     @Override
     public String toString() {
         return hasTime ? dateTime.format(OUTPUT_DATE_TIME) : dateTime.format(OUTPUT_DATE);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof TaskDateTime otherDateTime)) {
+            return false;
+        }
+        return hasTime == otherDateTime.hasTime && dateTime.equals(otherDateTime.dateTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dateTime, hasTime);
     }
 }

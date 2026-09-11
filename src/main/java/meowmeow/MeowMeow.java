@@ -108,19 +108,13 @@ public class MeowMeow {
                     return ui.formatRemoved(removed, tasks.size());
                 }
                 case TODO -> {
-                    Task added = tasks.add(Parser.parseTodo(arguments));
-                    storage.save(tasks.asList());
-                    return ui.formatAdded(added, tasks.size());
+                    return addTask(Parser.parseTodo(arguments));
                 }
                 case DEADLINE -> {
-                    Task added = tasks.add(Parser.parseDeadline(arguments));
-                    storage.save(tasks.asList());
-                    return ui.formatAdded(added, tasks.size());
+                    return addTask(Parser.parseDeadline(arguments));
                 }
                 case EVENT -> {
-                    Task added = tasks.add(Parser.parseEvent(arguments));
-                    storage.save(tasks.asList());
-                    return ui.formatAdded(added, tasks.size());
+                    return addTask(Parser.parseEvent(arguments));
                 }
                 case ON -> {
                     LocalDate date = Parser.parseDate(arguments).toLocalDate();
@@ -141,6 +135,23 @@ public class MeowMeow {
         } catch (MeowMeowException e) {
             return ui.formatError(e.getMessage());
         }
+    }
+
+    /**
+     * Adds the given task to the list, saves, and returns the confirmation.
+     *
+     * @param task Task to add.
+     * @return Confirmation text naming the task and the new list size.
+     * @throws MeowMeowException If the list already holds a duplicate, or the
+     *         updated list cannot be saved.
+     */
+    private String addTask(Task task) throws MeowMeowException {
+        if (tasks.hasDuplicateOf(task)) {
+            throw new MeowMeowException("Meow :> You already have that task. I won't add it twice.");
+        }
+        tasks.add(task);
+        storage.save(tasks.asList());
+        return ui.formatAdded(task, tasks.size());
     }
 
     /**

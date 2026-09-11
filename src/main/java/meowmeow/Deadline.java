@@ -35,4 +35,9 @@ public class Deadline extends Task {
     public String toFileFormat() {
         return "D | " + super.toFileFormat() + " | " + by.toStorageFormat();
     }
+
+    @Override
+    public boolean isDuplicateOf(Task other) {
+        return super.isDuplicateOf(other) && by.equals(((Deadline) other).by);
+    }
 }
