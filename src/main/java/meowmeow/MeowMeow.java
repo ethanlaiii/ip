@@ -78,6 +78,7 @@ public class MeowMeow {
             }
 
             CommandType command = Parser.parseCommand(input);
+            assert command != null : "parseCommand returns UNKNOWN, never null";
             String arguments = Parser.parseArguments(input);
 
             switch (command) {

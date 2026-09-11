@@ -22,6 +22,7 @@ public class TaskList {
      * @param tasks Tasks to populate the list with.
      */
     public TaskList(ArrayList<Task> tasks) {
+        assert tasks != null : "Task list cannot be built from a null collection";
         this.tasks = tasks;
     }
 
@@ -35,6 +36,7 @@ public class TaskList {
     }
 
     public Task get(int index) {
+        assert index >= 0 && index < tasks.size() : "Index should have been validated by parseIndex";
         return tasks.get(index);
     }
 
@@ -66,6 +68,7 @@ public class TaskList {
      * @return The task that was removed.
      */
     public Task delete(int index) {
+        assert index >= 0 && index < tasks.size() : "Index should have been validated by parseIndex";
         return tasks.remove(index);
     }
 
@@ -75,6 +78,7 @@ public class TaskList {
      * @param index Zero-based index of the task.
      */
     public void markAsDone(int index) {
+        assert index >= 0 && index < tasks.size() : "Index should have been validated by parseIndex";
         tasks.get(index).markAsDone();
     }
 
@@ -84,6 +88,7 @@ public class TaskList {
      * @param index Zero-based index of the task.
      */
     public void markAsNotDone(int index) {
+        assert index >= 0 && index < tasks.size() : "Index should have been validated by parseIndex";
         tasks.get(index).markAsNotDone();
     }
 
@@ -130,6 +135,7 @@ public class TaskList {
             throw new MeowMeowException("There's no task " + (index + 1) + ". You have "
                     + tasks.size() + " task(s).");
         }
+        assert index >= 0 && index < tasks.size() : "parseIndex must return an in-range index";
         return index;
     }
 
