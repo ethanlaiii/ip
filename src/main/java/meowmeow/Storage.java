@@ -114,6 +114,7 @@ public class Storage {
             return null;
         }
 
+        assert task != null : "Every path that reaches here must have assigned a task";
         if (doneFlag.equals("1")) {
             task.markAsDone();
         }
