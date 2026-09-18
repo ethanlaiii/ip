@@ -88,56 +88,21 @@ public class MeowMeow {
             assert command != null : "parseCommand returns UNKNOWN, never null";
             String arguments = Parser.parseArguments(input);
 
-            switch (command) {
-                case BYE -> {
-                    isExit = true;
-                    return ui.formatFarewell();
-                }
-                case LIST -> {
-                    return ui.formatList(tasks.asList());
-                }
-                case MARK -> {
-                    int index = tasks.parseIndex(arguments, "mark");
-                    tasks.markAsDone(index);
-                    storage.save(tasks.asList());
-                    return ui.formatTaskMessage("Nice! I've marked this task as done:", tasks.get(index));
-                }
-                case UNMARK -> {
-                    int index = tasks.parseIndex(arguments, "unmark");
-                    tasks.markAsNotDone(index);
-                    storage.save(tasks.asList());
-                    return ui.formatTaskMessage("OK, I've marked this task as not done yet:", tasks.get(index));
-                }
-                case DELETE -> {
-                    int index = tasks.parseIndex(arguments, "delete");
-                    Task removed = tasks.delete(index);
-                    storage.save(tasks.asList());
-                    return ui.formatRemoved(removed, tasks.size());
-                }
-                case TODO -> {
-                    return addTask(Parser.parseTodo(arguments));
-                }
-                case DEADLINE -> {
-                    return addTask(Parser.parseDeadline(arguments));
-                }
-                case EVENT -> {
-                    return addTask(Parser.parseEvent(arguments));
-                }
-                case ON -> {
-                    LocalDate date = Parser.parseDate(arguments).toLocalDate();
-                    return ui.formatTasksOn(date, tasks.findOccurringOn(date));
-                }
-                case FIND -> {
-                    if (arguments.isEmpty()) {
-                        throw new MeowMeowException("What should I search for? Try: find book");
-                    }
-                    return ui.formatMatches(tasks.findByKeyword(arguments));
-                }
+            return switch (command) {
+                case BYE -> exit();
+                case LIST -> ui.formatList(tasks.asList());
+                case MARK -> markTask(arguments);
+                case UNMARK -> unmarkTask(arguments);
+                case DELETE -> deleteTask(arguments);
+                case TODO -> addTask(Parser.parseTodo(arguments));
+                case DEADLINE -> addTask(Parser.parseDeadline(arguments));
+                case EVENT -> addTask(Parser.parseEvent(arguments));
+                case ON -> listTasksOn(arguments);
+                case FIND -> findTasks(arguments);
                 case UNKNOWN -> throw new MeowMeowException(
-                        "I don't know what \"" + Parser.parseCommandWord(input) + "\" means. "
+                        "Meow :> I don't know what \"" + Parser.parseCommandWord(input) + "\" means. "
                                 + "I understand: todo, deadline, event, list, mark, unmark, delete, on, find, bye");
-                default -> throw new MeowMeowException("Something went wrong. Meow?");
-            }
+            };
 
         } catch (MeowMeowException e) {
             return ui.formatError(e.getMessage());
@@ -180,4 +145,86 @@ public class MeowMeow {
     public static void main(String[] args) {
         new MeowMeow(DEFAULT_FILE_PATH).run();
     }
+
+    /**
+     * Ends the session and returns the farewell message.
+     *
+     * @return Farewell text.
+     */
+    private String exit() {
+        isExit = true;
+        return ui.formatFarewell();
+    }
+
+    /**
+     * Marks the task named by the given argument as done and saves the list.
+     *
+     * @param arguments Text the user typed after the command word.
+     * @return Confirmation naming the task.
+     * @throws MeowMeowException If the argument is not a valid task number, or
+     *         the updated list cannot be saved.
+     */
+    private String markTask(String arguments) throws MeowMeowException {
+        int index = tasks.parseIndex(arguments, "mark");
+        tasks.markAsDone(index);
+        storage.save(tasks.asList());
+        return ui.formatTaskMessage("Nice! I've marked this task as done:", tasks.get(index));
+    }
+
+    /**
+     * Marks the task named by the given argument as not done and saves the list.
+     *
+     * @param arguments Text the user typed after the command word.
+     * @return Confirmation naming the task.
+     * @throws MeowMeowException If the argument is not a valid task number, or
+     *         the updated list cannot be saved.
+     */
+    private String unmarkTask(String arguments) throws MeowMeowException {
+        int index = tasks.parseIndex(arguments, "unmark");
+        tasks.markAsNotDone(index);
+        storage.save(tasks.asList());
+        return ui.formatTaskMessage("OK, I've marked this task as not done yet:", tasks.get(index));
+    }
+
+    /**
+     * Removes the task named by the given argument and saves the list.
+     *
+     * @param arguments Text the user typed after the command word.
+     * @return Confirmation naming the task and the new list size.
+     * @throws MeowMeowException If the argument is not a valid task number, or
+     *         the updated list cannot be saved.
+     */
+    private String deleteTask(String arguments) throws MeowMeowException {
+        int index = tasks.parseIndex(arguments, "delete");
+        Task removed = tasks.delete(index);
+        storage.save(tasks.asList());
+        return ui.formatRemoved(removed, tasks.size());
+    }
+
+    /**
+     * Returns the tasks occurring on the date named by the given argument.
+     *
+     * @param arguments Text the user typed after the command word.
+     * @return Numbered list of tasks on that date.
+     * @throws MeowMeowException If the date is missing or cannot be read.
+     */
+    private String listTasksOn(String arguments) throws MeowMeowException {
+        LocalDate date = Parser.parseDate(arguments).toLocalDate();
+        return ui.formatTasksOn(date, tasks.findOccurringOn(date));
+    }
+
+    /**
+     * Returns the tasks whose descriptions contain the given search text.
+     *
+     * @param arguments Text the user typed after the command word.
+     * @return Numbered list of matching tasks.
+     * @throws MeowMeowException If no search text was given.
+     */
+    private String findTasks(String arguments) throws MeowMeowException {
+        if (arguments.isEmpty()) {
+            throw new MeowMeowException("What should I search for? Try: find book");
+        }
+        return ui.formatMatches(tasks.findByKeyword(arguments));
+    }
+
 }
