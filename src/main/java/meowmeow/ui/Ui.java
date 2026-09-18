@@ -17,7 +17,8 @@ public class Ui {
     private static final String TASK_INDENT = "  ";
     private static final DateTimeFormatter DATE_HEADING =
             DateTimeFormatter.ofPattern("MMM dd yyyy");
-
+    private static final String COMMANDS =
+            "todo, deadline, event, list, mark, unmark, delete, on, find, bye";
     private final Scanner scanner;
 
     /**
@@ -74,8 +75,10 @@ public class Ui {
      * @return Welcome text.
      */
     public String formatWelcome() {
-        return formatMessage("Hello! I'm MeowMeow.", "What can I do for you? Meow :>");
-    }
+        return formatMessage("Hello! I'm MeowMeow.",
+                "What can I do for you? Meow :>",
+                "",
+                "I understand: " + COMMANDS);    }
 
     /**
      * Returns the farewell message shown before the chatbot exits.
@@ -166,7 +169,17 @@ public class Ui {
             return formatMessage(heading, "Nothing scheduled. Enjoy the free time! Meow :>");
         }
         return formatNumberedTasks(heading, matches);
+    }
 
+    /**
+     * Returns the message shown when a command word is not recognised.
+     *
+     * @param commandWord Word the user typed.
+     * @return Error text naming the word and listing the known commands.
+     */
+    public String formatUnknownCommand(String commandWord) {
+        return formatMessage("I don't know what \"" + commandWord + "\" means.",
+                "I understand: " + COMMANDS);
     }
 
     /**

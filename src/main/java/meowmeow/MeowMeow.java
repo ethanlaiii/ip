@@ -100,8 +100,7 @@ public class MeowMeow {
                 case ON -> listTasksOn(arguments);
                 case FIND -> findTasks(arguments);
                 case UNKNOWN -> throw new MeowMeowException(
-                        "Meow :> I don't know what \"" + Parser.parseCommandWord(input) + "\" means. "
-                                + "I understand: todo, deadline, event, list, mark, unmark, delete, on, find, bye");
+                        ui.formatUnknownCommand(Parser.parseCommandWord(input)));
             };
 
         } catch (MeowMeowException e) {
