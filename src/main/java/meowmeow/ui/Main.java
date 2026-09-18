@@ -1,4 +1,4 @@
-package meowmeow;
+package meowmeow.ui;
 
 import java.io.IOException;
 
@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import meowmeow.MeowMeow;
 
 /**
  * GUI for MeowMeow using FXML.

@@ -1,4 +1,6 @@
-package meowmeow;
+package meowmeow.task;
+
+import meowmeow.MeowMeowException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

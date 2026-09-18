@@ -1,4 +1,4 @@
-package meowmeow;
+package meowmeow.ui;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import meowmeow.MeowMeow;
 
 /**
  * Controller for the main GUI.

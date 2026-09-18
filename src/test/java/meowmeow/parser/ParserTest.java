@@ -1,9 +1,11 @@
-package meowmeow;
+package meowmeow.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import meowmeow.MeowMeowException;
+import meowmeow.task.Deadline;
 import org.junit.jupiter.api.Test;
 
 public class ParserTest {

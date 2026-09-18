@@ -1,4 +1,4 @@
-package meowmeow;
+package meowmeow.parser;
 
 /**
  * Represents the set of commands the chatbot understands.

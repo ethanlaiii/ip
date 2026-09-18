@@ -1,4 +1,10 @@
-package meowmeow;
+package meowmeow.parser;
+
+import meowmeow.*;
+import meowmeow.task.Deadline;
+import meowmeow.task.Event;
+import meowmeow.task.TaskDateTime;
+import meowmeow.task.Todo;
 
 /**
  * Interprets raw user input and converts it into commands and task objects.

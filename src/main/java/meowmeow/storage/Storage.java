@@ -1,4 +1,7 @@
-package meowmeow;
+package meowmeow.storage;
+
+import meowmeow.*;
+import meowmeow.task.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
