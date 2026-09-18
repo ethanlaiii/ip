@@ -80,52 +80,71 @@ public class Storage {
      */
     private Task parseLine(String line) {
         String[] parts = line.split("\\s*\\|\\s*");
-
-        if (parts.length < 3) {
+        if (!hasValidCommonFields(parts)) {
             return null;
         }
 
-        String type = parts[0];
-        String doneFlag = parts[1];
         String description = parts[2];
-
-        if (description.isEmpty()) {
-            return null;
-        }
-        if (!doneFlag.equals("0") && !doneFlag.equals("1")) {
-            return null;
-        }
-
-        Task task;
         try {
-            switch (type) {
-                case "T" -> task = new Todo(description);
-                case "D" -> {
-                    if (parts.length < 4 || parts[3].isEmpty()) {
-                        return null;
-                    }
-                    task = new Deadline(description, TaskDateTime.fromStorage(parts[3]));
-                }
-                case "E" -> {
-                    if (parts.length < 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
-                        return null;
-                    }
-                    task = new Event(description, TaskDateTime.fromStorage(parts[3]),
-                            TaskDateTime.fromStorage(parts[4]));
-                }
-                default -> {
-                    return null;
-                }
+            Task task = switch (parts[0]) {
+                case "T" -> new Todo(description);
+                case "D" -> readDeadline(description, parts);
+                case "E" -> readEvent(description, parts);
+                default -> throw new MeowMeowException("Unknown task type: " + parts[0]);
+            };
+            if (parts[1].equals("1")) {
+                task.markAsDone();
             }
+            return task;
         } catch (MeowMeowException e) {
             return null;
         }
+    }
 
-        assert task != null : "Every path that reaches here must have assigned a task";
-        if (doneFlag.equals("1")) {
-            task.markAsDone();
+    /**
+     * Returns whether the record has the three fields every task type shares:
+     * a type, a done flag of 0 or 1, and a non-empty description.
+     *
+     * @param parts Fields split from one line of the save file.
+     * @return True if the shared fields are present and well formed.
+     */
+    private boolean hasValidCommonFields(String[] parts) {
+        return parts.length >= 3
+                && !parts[2].isEmpty()
+                && (parts[1].equals("0") || parts[1].equals("1"));
+    }
+
+    /**
+     * Returns the deadline encoded by the given record.
+     *
+     * @param description Description already read from the record.
+     * @param parts Fields split from one line of the save file.
+     * @return Decoded deadline.
+     * @throws MeowMeowException If the due date is missing or unreadable.
+     */
+    private Deadline readDeadline(String description, String[] parts) throws MeowMeowException {
+        if (parts.length < 4 || parts[3].isEmpty()) {
+            throw new MeowMeowException("Deadline record has no due date.");
         }
-        return task;
+        return new Deadline(description, TaskDateTime.fromStorage(parts[3]));
+    }
+
+    /**
+     * Returns the event encoded by the given record.
+     *
+     * @param description Description already read from the record.
+     * @param parts Fields split from one line of the save file.
+     * @return Decoded event.
+     * @throws MeowMeowException If either time is missing or unreadable, or the
+     *         start is not before the end.
+     */
+    private Event readEvent(String description, String[] parts) throws MeowMeowException {
+        if (parts.length < 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
+            throw new MeowMeowException("Event record is missing a start or end time.");
+        }
+        return new Event(description,
+                TaskDateTime.fromStorage(parts[3]),
+                TaskDateTime.fromStorage(parts[4]));
     }
 
     /**
