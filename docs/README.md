@@ -216,8 +216,6 @@ same instant. Give a time, or use two different days.
 - **One list, one user.** No accounts, no sharing, no sync.
 - **No priorities, tags, recurring tasks or reminders.**
 - **Times are 24-hour on input.** `6pm` is not accepted; write `1800`.
-- **The window layout is a fixed size.** You can resize the window, but the
-  contents do not reflow to fill it.
 
 ## Command reference
 
