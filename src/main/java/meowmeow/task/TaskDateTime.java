@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
 import java.util.Map;
@@ -18,15 +19,15 @@ import java.util.Objects;
  */
 public class TaskDateTime {
     private static final DateTimeFormatter[] DATE_TIME_FORMATS = {
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
-            DateTimeFormatter.ofPattern("d/M/yyyy HHmm"),
-            DateTimeFormatter.ofPattern("d/M/yyyy HH:mm")
+            strict("uuuu-MM-dd HHmm"),
+            strict("uuuu-MM-dd HH:mm"),
+            strict("d/M/uuuu HHmm"),
+            strict("d/M/uuuu HH:mm")
     };
 
     private static final DateTimeFormatter[] DATE_FORMATS = {
-            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-            DateTimeFormatter.ofPattern("d/M/yyyy")
+            strict("uuuu-MM-dd"),
+            strict("d/M/uuuu")
     };
 
     private static final DateTimeFormatter OUTPUT_DATE =
@@ -157,6 +158,17 @@ public class TaskDateTime {
             return dateTime.isBefore(LocalDateTime.now());
         }
         return dateTime.toLocalDate().isBefore(LocalDate.now());
+    }
+
+    /**
+     * Returns a formatter for the given pattern that rejects invalid dates
+     * rather than adjusting them to the nearest valid one.
+     *
+     * @param pattern Date or date-time pattern, using uuuu for the year.
+     * @return Strictly resolving formatter.
+     */
+    private static DateTimeFormatter strict(String pattern) {
+        return DateTimeFormatter.ofPattern(pattern).withResolverStyle(ResolverStyle.STRICT);
     }
 
     @Override
