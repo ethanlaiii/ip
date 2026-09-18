@@ -10,8 +10,14 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+
 /**
  * Controller for the main GUI.
+ * <p>
+ * Reused from the SE-EDU JavaFX tutorial, part 4
+ * (https://se-education.org/guides/tutorials/javaFxPart4.html),
+ * with modifications: renamed from Duke, shows a welcome message on startup,
+ * and closes the window a short time after the bye command.
  */
 public class MainWindow extends AnchorPane {
     @FXML

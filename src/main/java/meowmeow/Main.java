@@ -10,6 +10,10 @@ import javafx.stage.Stage;
 
 /**
  * GUI for MeowMeow using FXML.
+ * <p>
+ * Reused from the SE-EDU JavaFX tutorial, part 4
+ * (https://se-education.org/guides/tutorials/javaFxPart4.html),
+ * with minor modifications: renamed from Duke, and added the window title.
  */
 public class Main extends Application {
 
