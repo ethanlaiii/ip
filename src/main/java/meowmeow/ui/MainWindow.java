@@ -1,4 +1,4 @@
-package meowmeow;
+package meowmeow.ui;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -10,8 +10,15 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import meowmeow.MeowMeow;
+
 /**
  * Controller for the main GUI.
+ * <p>
+ * Reused from the SE-EDU JavaFX tutorial, part 4
+ * (https://se-education.org/guides/tutorials/javaFxPart4.html),
+ * with modifications: renamed from Duke, shows a welcome message on startup,
+ * and closes the window a short time after the bye command.
  */
 public class MainWindow extends AnchorPane {
     @FXML
@@ -54,7 +61,13 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
-        String response = meowMeow.getResponse(input);
+        String response;
+        try {
+            response = meowMeow.getResponse(input);
+        } catch (Exception e) {
+            response = "Something went wrong inside me: " + e;
+        }
+
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getMeowMeowDialog(response, meowMeowImage)

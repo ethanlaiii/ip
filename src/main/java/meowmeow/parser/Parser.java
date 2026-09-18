@@ -1,4 +1,12 @@
-package meowmeow;
+package meowmeow.parser;
+
+import meowmeow.MeowMeowException;
+import meowmeow.task.Deadline;
+import meowmeow.task.Event;
+import meowmeow.task.TaskDateTime;
+import meowmeow.task.Todo;
+
+import java.util.regex.Pattern;
 
 /**
  * Interprets raw user input and converts it into commands and task objects.
@@ -23,6 +31,33 @@ public class Parser {
      */
     private static String[] splitCommandAndArguments(String input) {
         return input.trim().split("\\s+", 2);
+    }
+
+    /**
+     * Throws if the given delimiter appears more than once in the given text.
+     *
+     * @param text Text to inspect.
+     * @param delimiter Delimiter that may appear at most once.
+     * @param example Example of correct usage, appended to the error message.
+     * @throws MeowMeowException If the delimiter appears more than once.
+     */
+    private static void requireAtMostOne(String text, String delimiter, String example)
+            throws MeowMeowException {
+        if (countOccurrences(text, delimiter) > 1) {
+            throw new MeowMeowException("You used " + delimiter + " more than once, "
+                    + "so I don't know which one you meant. " + example);
+        }
+    }
+
+    /**
+     * Returns how many times the target appears in the given text.
+     *
+     * @param text Text to search.
+     * @param target Text to count.
+     * @return Number of non-overlapping occurrences.
+     */
+    private static int countOccurrences(String text, String target) {
+        return text.split(Pattern.quote(target), -1).length - 1;
     }
 
     /**
@@ -68,10 +103,11 @@ public class Parser {
      * @param arguments Text following the deadline command word.
      * @return Deadline with the given description and due date.
      * @throws MeowMeowException If the description is missing, the /by
-     *         delimiter is absent, or the date cannot be parsed.
+     *         delimiter is absent, appears more than once, or the date cannot be parsed.
      */
     public static Deadline parseDeadline(String arguments) throws MeowMeowException {
         String example = "Try: deadline return book /by 2019-12-02 1800";
+        requireAtMostOne(arguments, "/by", example);
         String[] parts = arguments.split("/by", 2);
         String description = parts[0].trim();
 
@@ -82,7 +118,12 @@ public class Parser {
             throw new MeowMeowException("I need a due date after /by. " + example);
         }
 
-        return new Deadline(description, TaskDateTime.parse(parts[1].trim()));
+        TaskDateTime by = TaskDateTime.parse(parts[1].trim());
+        if (by.isInThePast()) {
+            throw new MeowMeowException("That deadline has already passed (" + by + "). "
+                    + "Give me a date in the future.");
+        }
+        return new Deadline(description, by);
     }
 
     /**
@@ -93,10 +134,12 @@ public class Parser {
      * @param arguments Text following the event command word.
      * @return Event with the given description, start and end times.
      * @throws MeowMeowException If the description is missing, either
-     *         delimiter is absent, or a time cannot be parsed.
+     *         delimiter is absent or repeated, or a time cannot be parsed,
+     *         or a time is invalid, or the event starts in the past.
      */
     public static Event parseEvent(String arguments) throws MeowMeowException {
         String example = "Try: event project meeting /from 2019-08-06 1400 /to 2019-08-06 1600";
+        requireAtMostOne(arguments, "/from", example);
         String[] fromParts = arguments.split("/from", 2);
         String description = fromParts[0].trim();
 
@@ -107,6 +150,7 @@ public class Parser {
             throw new MeowMeowException("I need a start time after /from. " + example);
         }
 
+        requireAtMostOne(fromParts[1], "/to", example);
         String[] toParts = fromParts[1].split("/to", 2);
         String fromText = toParts[0].trim();
 
@@ -117,9 +161,15 @@ public class Parser {
             throw new MeowMeowException("I need an end time after /to. " + example);
         }
 
-        return new Event(description,
-                TaskDateTime.parse(fromText),
-                TaskDateTime.parse(toParts[1].trim()));
+        TaskDateTime from = TaskDateTime.parse(fromText);
+        TaskDateTime to = TaskDateTime.parse(toParts[1].trim());
+
+        if (from.isInThePast()) {
+            throw new MeowMeowException("That event starts in the past (" + from + "). "
+                    + "Give me a start time in the future.");
+        }
+
+        return new Event(description, from, to);
     }
 
     /**

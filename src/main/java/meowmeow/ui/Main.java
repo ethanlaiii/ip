@@ -1,15 +1,20 @@
-package meowmeow;
-
-import java.io.IOException;
+package meowmeow.ui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import meowmeow.MeowMeow;
+
+import java.io.IOException;
 
 /**
  * GUI for MeowMeow using FXML.
+ * <p>
+ * Reused from the SE-EDU JavaFX tutorial, part 4
+ * (https://se-education.org/guides/tutorials/javaFxPart4.html),
+ * with minor modifications: renamed from Duke, and added the window title.
  */
 public class Main extends Application {
 

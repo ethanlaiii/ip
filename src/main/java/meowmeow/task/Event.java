@@ -1,4 +1,6 @@
-package meowmeow;
+package meowmeow.task;
+
+import meowmeow.MeowMeowException;
 
 import java.time.LocalDate;
 
@@ -18,9 +20,14 @@ public class Event extends Task {
      * @param description Description of the event.
      * @param from Date or time the event starts.
      * @param to Date or time the event ends.
+     * @throws MeowMeowException If the start is not strictly before the end.
      */
-    public Event(String description, TaskDateTime from, TaskDateTime to) {
+    public Event(String description, TaskDateTime from, TaskDateTime to) throws MeowMeowException{
         super(description);
+        if (to.isBefore(from)) {
+            throw new MeowMeowException("An event has to start before it ends. "
+                    + "You gave " + from + " to " + to + ".");
+        }
         this.from = from;
         this.to = to;
     }

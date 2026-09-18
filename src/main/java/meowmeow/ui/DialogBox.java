@@ -1,7 +1,4 @@
-package meowmeow;
-
-import java.io.IOException;
-import java.util.Collections;
+package meowmeow.ui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,9 +11,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
+import java.io.IOException;
+import java.util.Collections;
+
 /**
  * Represents a dialog box consisting of an ImageView to represent the speaker's face
  * and a label containing text from the speaker.
+ * <p>
+ * Reused from the SE-EDU JavaFX tutorial, part 4
+ * (https://se-education.org/guides/tutorials/javaFxPart4.html),
+ * with minor modifications to naming.
  */
 public class DialogBox extends HBox {
     @FXML
