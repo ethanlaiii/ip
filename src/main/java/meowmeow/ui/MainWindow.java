@@ -36,13 +36,16 @@ public class MainWindow extends AnchorPane {
     private Image meowMeowImage = new Image(this.getClass().getResourceAsStream("/images/Meow1.jpg"));
     private static final Duration EXIT_DELAY = Duration.seconds(2);
 
+    /**
+     * Prepares the window after FXML loading, binding the scroll position to the
+     * dialog container so that new messages scroll into view.
+     */
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
     /**
-     * Injects the MeowMeow instance.
      * Injects the MeowMeow instance and shows its greeting.
      *
      * @param m Chatbot instance to route user input to.

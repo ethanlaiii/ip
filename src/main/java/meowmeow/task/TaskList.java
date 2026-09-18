@@ -38,6 +38,12 @@ public class TaskList {
         return tasks.isEmpty();
     }
 
+    /**
+     * Returns the task at the given index.
+     *
+     * @param index Zero-based index, already validated by {@link #parseIndex}.
+     * @return Task at that position.
+     */
     public Task get(int index) {
         assert index >= 0 && index < tasks.size() : "Index should have been validated by parseIndex";
         return tasks.get(index);

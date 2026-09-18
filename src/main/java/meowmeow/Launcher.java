@@ -11,6 +11,11 @@ import meowmeow.ui.Main;
  * with the package declaration added.
  */
 public class Launcher {
+    /**
+     * Starts the application.
+     *
+     * @param args Command line arguments, which are ignored.
+     */
     public static void main(String[] args) {
         Application.launch(Main.class, args);
     }
