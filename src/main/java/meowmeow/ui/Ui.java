@@ -15,9 +15,6 @@ import java.util.Scanner;
 public class Ui {
     private static final String LINE = "    ____________________________________________________________";
     private static final String TASK_INDENT = "  ";
-    private static final String LOGO = "  /\\_/\\\n"
-            + " ( o.o )\n"
-            + "  > ^ <\n";
     private static final DateTimeFormatter DATE_HEADING =
             DateTimeFormatter.ofPattern("MMM dd yyyy");
 
@@ -77,7 +74,7 @@ public class Ui {
      * @return Welcome text.
      */
     public String formatWelcome() {
-        return formatMessage(LOGO, "Hello! I'm MeowMeow.", "What can I do for you? Meow :>");
+        return formatMessage("Hello! I'm MeowMeow.", "What can I do for you? Meow :>");
     }
 
     /**

@@ -12,7 +12,7 @@ Display | Name | Github Profile | Homepage
 | What | Source | Extent |
 |---|---|---|
 | `Launcher`, `Main`, `MainWindow`, `DialogBox` | [SE-EDU JavaFX tutorial](https://se-education.org/guides/tutorials/javaFx.html), parts 1–4 | Adopted largely as given. Renamed `Duke` to `MeowMeow`, moved into the `meowmeow` package, and added the welcome message, window title and exit delay. |
-| `src/main/resources/view/MainWindow.fxml`, `DialogBox.fxml` | Same tutorial, part 4 | Reused as given. Updated the `fx:controller` reference for the package, and added a `<Font>` element to `DialogBox.fxml`. |
+| `src/main/resources/view/MainWindow.fxml`, `DialogBox.fxml` | Same tutorial, part 4 | Reused as given. Updated the `fx:controller` reference for the package. |
 | JavaFX dependency block in `build.gradle` | Same tutorial, part 1 | Reused as given. |
 
 # I would like to join this list. How can I help the project
