@@ -60,7 +60,10 @@ public class DialogBox extends HBox {
      * @return A dialog box aligned for the user.
      */
     public static DialogBox getUserDialog(String text, Image img) {
-        return new DialogBox(text, img);
+        DialogBox db = new DialogBox(text, img);
+        db.setBubbleStyle("user-bubble");
+        return db;
+
     }
 
     /**
@@ -73,6 +76,16 @@ public class DialogBox extends HBox {
     public static DialogBox getMeowMeowDialog(String text, Image img) {
         var db = new DialogBox(text, img);
         db.flip();
+        db.setBubbleStyle("bot-bubble");
         return db;
+    }
+
+    /**
+     * Applies the bubble styling for one side of the conversation.
+     *
+     * @param bubbleClass Style class identifying the speaker.
+     */
+    private void setBubbleStyle(String bubbleClass) {
+        dialog.getStyleClass().addAll("bubble", bubbleClass);
     }
 }
