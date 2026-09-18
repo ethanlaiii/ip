@@ -2,12 +2,15 @@ package meowmeow.task;
 
 import meowmeow.MeowMeowException;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Objects;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Represents a date, optionally with a time, attached to a task.
@@ -31,6 +34,23 @@ public class TaskDateTime {
     private static final DateTimeFormatter OUTPUT_DATE_TIME =
             DateTimeFormatter.ofPattern("MMM dd yyyy, h:mma", Locale.ENGLISH);
 
+    private static final Map<String, DayOfWeek> DAY_NAMES = Map.ofEntries(
+            Map.entry("mon", DayOfWeek.MONDAY),
+            Map.entry("monday", DayOfWeek.MONDAY),
+            Map.entry("tue", DayOfWeek.TUESDAY),
+            Map.entry("tuesday", DayOfWeek.TUESDAY),
+            Map.entry("wed", DayOfWeek.WEDNESDAY),
+            Map.entry("wednesday", DayOfWeek.WEDNESDAY),
+            Map.entry("thu", DayOfWeek.THURSDAY),
+            Map.entry("thursday", DayOfWeek.THURSDAY),
+            Map.entry("fri", DayOfWeek.FRIDAY),
+            Map.entry("friday", DayOfWeek.FRIDAY),
+            Map.entry("sat", DayOfWeek.SATURDAY),
+            Map.entry("saturday", DayOfWeek.SATURDAY),
+            Map.entry("sun", DayOfWeek.SUNDAY),
+            Map.entry("sunday", DayOfWeek.SUNDAY)
+    );
+
     private final LocalDateTime dateTime;
     private final boolean hasTime;
 
@@ -51,6 +71,12 @@ public class TaskDateTime {
     public static TaskDateTime parse(String input) throws MeowMeowException {
         String trimmed = input.trim();
 
+        DayOfWeek dayOfWeek = DAY_NAMES.get(trimmed.toLowerCase(Locale.ENGLISH));
+        if (dayOfWeek != null) {
+            LocalDate next = LocalDate.now().with(TemporalAdjusters.next(dayOfWeek));
+            return new TaskDateTime(next.atStartOfDay(), false);
+        }
+
         for (DateTimeFormatter format : DATE_TIME_FORMATS) {
             try {
                 return new TaskDateTime(LocalDateTime.parse(trimmed, format), true);
@@ -69,7 +95,7 @@ public class TaskDateTime {
 
         throw new MeowMeowException("I can't read \"" + trimmed + "\" as a date. "
                 + "Try yyyy-MM-dd or d/M/yyyy, optionally with a time, "
-                + "e.g. 2019-12-02 1800");
+                + "e.g. 2019-12-02 1800, or a day name like fri.");
     }
 
     /**
@@ -107,6 +133,30 @@ public class TaskDateTime {
      */
     public LocalDate toLocalDate() {
         return dateTime.toLocalDate();
+    }
+
+    /**
+     * Returns whether this date and time falls strictly before the given one.
+     *
+     * @param other Date and time to compare against.
+     * @return True if this one is earlier.
+     */
+    public boolean isBefore(TaskDateTime other) {
+        return dateTime.isBefore(other.dateTime);
+    }
+
+    /**
+     * Returns whether this date and time has already passed.
+     * Values given without a time are compared by date only, so a date-only
+     * value for today has not yet passed.
+     *
+     * @return True if this date and time is in the past.
+     */
+    public boolean isInThePast() {
+        if (hasTime) {
+            return dateTime.isBefore(LocalDateTime.now());
+        }
+        return dateTime.toLocalDate().isBefore(LocalDate.now());
     }
 
     @Override

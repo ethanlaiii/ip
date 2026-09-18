@@ -12,26 +12,26 @@ public class ParserTest {
 
     @Test
     public void parseDeadline_validInputWithTime_deadlineCreated() throws MeowMeowException {
-        Deadline deadline = Parser.parseDeadline("return book /by 2019-12-02 1800");
-        assertEquals("[D][ ] return book (by: Dec 02 2019, 6:00PM)", deadline.toString());
+        Deadline deadline = Parser.parseDeadline("return book /by 2099-12-02 1800");
+        assertEquals("[D][ ] return book (by: Dec 02 2099, 6:00PM)", deadline.toString());
     }
 
     @Test
     public void parseDeadline_validInputDateOnly_noTimeShown() throws MeowMeowException {
-        Deadline deadline = Parser.parseDeadline("return book /by 2019-12-02");
-        assertEquals("[D][ ] return book (by: Dec 02 2019)", deadline.toString());
+        Deadline deadline = Parser.parseDeadline("return book /by 2099-12-02");
+        assertEquals("[D][ ] return book (by: Dec 02 2099)", deadline.toString());
     }
 
     @Test
     public void parseDeadline_slashDateFormat_deadlineCreated() throws MeowMeowException {
-        Deadline deadline = Parser.parseDeadline("submit report /by 2/12/2019");
-        assertEquals("[D][ ] submit report (by: Dec 02 2019)", deadline.toString());
+        Deadline deadline = Parser.parseDeadline("submit report /by 2/12/2099");
+        assertEquals("[D][ ] submit report (by: Dec 02 2099)", deadline.toString());
     }
 
     @Test
     public void parseDeadline_extraSpacesAroundDelimiter_trimmed() throws MeowMeowException {
-        Deadline deadline = Parser.parseDeadline("  return book   /by   2019-12-02  ");
-        assertEquals("[D][ ] return book (by: Dec 02 2019)", deadline.toString());
+        Deadline deadline = Parser.parseDeadline("  return book   /by   2099-12-02  ");
+        assertEquals("[D][ ] return book (by: Dec 02 2099)", deadline.toString());
     }
 
     @Test

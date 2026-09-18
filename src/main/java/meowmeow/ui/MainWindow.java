@@ -61,7 +61,13 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
-        String response = meowMeow.getResponse(input);
+        String response;
+        try {
+            response = meowMeow.getResponse(input);
+        } catch (Exception e) {
+            response = "Something went wrong inside me: " + e;
+        }
+
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getMeowMeowDialog(response, meowMeowImage)
